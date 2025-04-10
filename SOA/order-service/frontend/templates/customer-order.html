@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Order Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- Top navigation -->
+    <nav class="bg-gray-800 text-white p-8">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold">Manwah Restaurant</h1>
+                <div class="space-x-8">
+                    <a href="/" class="text-xl hover:text-gray-300">Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Order Information -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Table #<span id="tableNumber">Loading...</span></h1>
+                <div class="flex items-center">
+                    <span class="text-sm text-gray-600 mr-2">Status:</span>
+                    <span id="orderStatus" class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">Loading...</span>
+                </div>
+            </div>
+            <p class="text-sm text-gray-600">Order ID: <span id="displayOrderId">Loading...</span></p>
+            <p class="text-sm text-gray-600">Order Time: <span id="orderTime">Loading...</span></p>
+        </div>
+
+        <!-- Main Order Area -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Order Items</h2>
+            <div id="orderItems" class="divide-y divide-gray-200">
+                <!-- Order items will be dynamically added here -->
+                <p class="text-gray-500 py-4">Loading order items...</p>
+            </div>
+
+            <!-- Order Total -->
+            <div class="mt-6 pt-4 border-t">
+                <div class="flex justify-between items-center text-lg font-semibold">
+                    <span>Total:</span>
+                    <span id="orderTotal">₫0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Controls -->
+        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+            <button id="cancelOrderBtn" class="w-full sm:w-auto flex-1 bg-gray-600 text-white text-lg font-medium px-6 py-3 rounded hover:bg-gray-700 transition-colors">
+                Cancel Order (If Applicable)
+            </button>
+        </div>
+
+        <!-- Order Status Tracker -->
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Order Status Tracker</h2>
+            <div class="flex justify-between items-center">
+                <div class="flex-1">
+                    <div class="relative">
+                        <div class="h-2 bg-gray-200 rounded">
+                            <div id="statusProgress" class="h-2 bg-blue-500 rounded" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between mt-4">
+                            <div class="text-center status-step" data-status="received">
+                                <div class="status-dot w-4 h-4 bg-gray-200 rounded-full mx-auto"></div>
+                                <p class="text-sm mt-1">Received</p>
+                            </div>
+                            <div class="text-center status-step" data-status="submitted">
+                                <div class="status-dot w-4 h-4 bg-gray-200 rounded-full mx-auto"></div>
+                                <p class="text-sm mt-1">Submitted</p>
+                            </div>
+                            <div class="text-center status-step" data-status="in-progress">
+                                <div class="status-dot w-4 h-4 bg-gray-200 rounded-full mx-auto"></div>
+                                <p class="text-sm mt-1">In Progress</p>
+                            </div>
+                            <div class="text-center status-step" data-status="ready">
+                                <div class="status-dot w-4 h-4 bg-gray-200 rounded-full mx-auto"></div>
+                                <p class="text-sm mt-1">Ready</p>
+                            </div>
+                            <div class="text-center status-step" data-status="delivered">
+                                <div class="status-dot w-4 h-4 bg-gray-200 rounded-full mx-auto"></div>
+                                <p class="text-sm mt-1">Delivered</p>
+                            </div>
+                            <div class="text-center status-step" data-status="completed">
+                                <div class="status-dot w-4 h-4 bg-gray-200 rounded-full mx-auto"></div>
+                                <p class="text-sm mt-1">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification" class="fixed top-4 right-4 max-w-md transform transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+        <div id="notificationContent" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md">
+            <div class="flex items-center">
+                <div class="py-1 mr-3">
+                    <svg id="notificationIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p id="notificationMessage">Operation successful!</p>
+                </div>
+                <button id="closeNotificationBtn" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-gray-500 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ (url_for('static', path='/js/config.js') ~ '?v=3') if request else '../js/config.js?v=3' }}"></script>
+    <script src="{{ (url_for('static', path='/js/api-config.js') ~ '?v=3') if request else '../js/api-config.js?v=3' }}"></script>
+    <script type="module" src="{{ (url_for('static', path='/js/utils/notifications.js') ~ '?v=3') if request else '../js/utils/notifications.js?v=3' }}"></script>
+    <script type="module" src="{{ (url_for('static', path='/js/customer-order.js') ~ '?v=3') if request else '../js/customer-order.js?v=3' }}"></script>
+</body>
+</html>

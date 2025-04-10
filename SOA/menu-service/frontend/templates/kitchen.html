@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Management - Manwah Restaurant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add base64 favicon to prevent 404 errors -->
+    <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD//wD/AAAA/wD/AP//AAD///8A//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8=" type="image/x-icon">
+    <style>
+        .image-container {
+            position: relative;
+            width: 64px;
+            height: 64px;
+        }
+        .image-error {
+            border: 2px solid #f56565;
+        }
+        .image-loading {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Top navigation -->
+    <nav class="bg-gray-800 text-white p-8">
+        <div class="max-w-screen-2xl mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold">Manwah Restaurant</h1>
+                <div class="space-x-8">
+                    <a href="/" class="text-xl hover:text-gray-300">Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div>
+        <!-- Content Header -->
+        <div class="bg-white shadow-sm">
+            <div class="max-w-screen-2xl mx-auto px-4 py-4">
+                <h1 class="text-2xl font-bold text-gray-800">Kitchen Management</h1>
+            </div>
+        </div>
+
+        <!-- Menu Items Management -->
+        <div class="bg-gray-100 py-4">
+            <div class="max-w-screen-2xl mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Menu Items</h2>
+                    <div class="flex space-x-2">
+                        <button id="removeItemBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            Remove Item
+                        </button>
+                        <button id="addItemBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                            Add New Item
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Items Table -->
+        <div class="max-w-screen-2xl mx-auto px-4 py-4">
+            <div class="bg-white rounded-lg shadow overflow-x-auto">
+                <table id="menuItemsTable" class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <!-- Menu items will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Edit Item</h3>
+                <form id="editForm" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Name</label>
+                        <input type="text" id="name" name="name" required 
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Category</label>
+                        <select id="category" name="category" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="APPETIZERS">Appetizers</option>
+                            <option value="MAIN_DISHES">Main Dishes</option>
+                            <option value="SOUPS">Soups</option>
+                            <option value="DESSERTS">Desserts</option>
+                            <option value="BEVERAGES">Beverages</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="price">Price (VND)</label>
+                        <input type="number" id="price" name="price" required min="0" step="1000"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Description</label>
+                        <textarea id="description" name="description" rows="3"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="status">Status</label>
+                        <select id="status" name="status" required
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="available">Available</option>
+                            <option value="unavailable">Unavailable</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">This determines if the item is visible to customers</p>
+                    </div>
+                    <!-- Hidden fields for proper form submission -->
+                    <input type="hidden" id="menu_type" name="menu_type" value="a-la-carte">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image">Image</label>
+                        <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif,image/webp"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <p class="text-xs text-gray-500 mt-1">Upload an image for this menu item (jpg, png formats recommended)</p>
+                        <div id="imagePreview" class="mt-2 hidden">
+                            <img id="previewImg" src="" alt="Preview" class="max-w-full h-32 object-contain">
+                            <p id="imageSizeWarning" class="text-xs text-red-500 mt-1 hidden">Warning: Image file size is large (>1MB). This may cause slow loading.</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="hideModal()" 
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Area -->
+    <div id="notificationArea" class="fixed bottom-4 right-4 z-50"></div>
+
+    <!-- Scripts -->
+    <script src="/static/js/kitchen.js"></script>
+    <!-- Add a loader to check if the scripts are loading correctly -->
+    <script>
+        const API_BASE_URL = '/api';
+        let currentItemId = null;
+
+        // Load menu items when the page loads
+        window.onload = function() {
+            loadMenuItems();
+        };
+
+        // Function to load menu items
+        async function loadMenuItems() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/menu-items`);
+                const items = await response.json();
+                displayMenuItems(items);
+            } catch (error) {
+                console.error('Error loading menu items:', error);
+            }
+        }
+
+        // Display menu items in the table
+        function displayMenuItems(items) {
+            const tableBody = document.querySelector('#menuItemsTable tbody');
+            tableBody.innerHTML = '';
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="image-container flex-shrink-0">
+                                <img src="/static/images/${item.image_url || 'placeholder.png'}" alt="${item.name}" 
+                                     class="h-12 w-12 object-cover rounded-full"
+                                     onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2264%22%20height%3D%2264%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_16d%20text%20%7Bfill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A10pt%20%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2213%22%20y%3D%2236.5%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${item.name}</div>
+                                <div class="text-sm text-gray-500">${item.description || 'No description'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${formatCategory(item.category)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${formatPrice(item.price)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${item.available ? 'Available' : 'Unavailable'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="editItem('${item.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                        <button onclick="toggleAvailability('${item.id}', ${!item.available})" class="text-${item.available ? 'red' : 'green'}-600 hover:text-${item.available ? 'red' : 'green'}-900">
+                            ${item.available ? 'Disable' : 'Enable'}
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Format category display
+        function formatCategory(category) {
+            return category.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        }
+
+        // Format price display
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+                minimumFractionDigits: 0
+            }).format(price).replace('₫', 'đ');
+        }
+
+        // Open the edit modal with item data
+        async function editItem(itemId) {
+            try {
+                currentItemId = itemId;
+                const response = await fetch(`${API_BASE_URL}/menu-items/${itemId}`);
+                const item = await response.json();
+                
+                // Fill the form with item data
+                document.getElementById('name').value = item.name;
+                document.getElementById('category').value = item.category;
+                document.getElementById('price').value = item.price;
+                document.getElementById('description').value = item.description || '';
+                document.getElementById('status').value = item.available ? 'available' : 'unavailable';
+                document.getElementById('menu_type').value = item.menu_type;
+                
+                // Show image preview if available
+                if (item.image_url) {
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('previewImg').src = `/static/images/${item.image_url}`;
+                } else {
+                    document.getElementById('imagePreview').classList.add('hidden');
+                }
+                
+                // Show the modal
+                document.getElementById('editModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading item details:', error);
+            }
+        }
+
+        // Hide the edit modal
+        function hideModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        // Setup form submission
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = new FormData(this);
+                
+                // Add available flag from status dropdown
+                const status = document.getElementById('status').value;
+                formData.set('available', status === 'available');
+                
+                let response;
+                
+                // Check if we're adding a new item or editing an existing one
+                if (currentItemId === 'new') {
+                    // Send POST request to create a new item
+                    response = await fetch(`${API_BASE_URL}/menu-items-with-image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else {
+                    // Send PUT request to update an existing item
+                    response = await fetch(`${API_BASE_URL}/menu-items-with-image/${currentItemId}`, {
+                        method: 'PUT',
+                        body: formData
+                    });
+                }
+                
+                if (response.ok) {
+                    // Reload the menu items and hide the modal
+                    hideModal();
+                    loadMenuItems();
+                    alert(currentItemId === 'new' ? 'Item created successfully' : 'Item updated successfully');
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error processing item');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Error processing item: ' + error.message);
+            }
+        });
+
+        // Toggle item availability
+        async function toggleAvailability(itemId, available) {
+            try {
+                const item = await (await fetch(`${API_BASE_URL}/menu-items/${itemId}`)).json();
+                item.available = available;
+                
+                // Remove the id property as it's not expected in the update
+                delete item.id;
+                
+                const response = await fetch(`${API_BASE_URL}/menu-items/${itemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(item)
+                });
+                
+                if (response.ok) {
+                    loadMenuItems();
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error updating availability');
+                }
+            } catch (error) {
+                console.error('Error toggling availability:', error);
+                alert('Error toggling availability: ' + error.message);
+            }
+        }
+
+        // Setup image preview
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('previewImg').src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                // Check file size
+                if (file.size > 1024 * 1024) { // 1MB
+                    document.getElementById('imageSizeWarning').classList.remove('hidden');
+                } else {
+                    document.getElementById('imageSizeWarning').classList.add('hidden');
+                }
+            }
+        });
+
+        // Add item button
+        document.getElementById('addItemBtn').addEventListener('click', function() {
+            // Reset the form
+            document.getElementById('editForm').reset();
+            document.getElementById('imagePreview').classList.add('hidden');
+            currentItemId = 'new'; // We'll handle this specially when submitting
+            
+            // Show the modal
+            document.getElementById('editModal').classList.remove('hidden');
+        });
+
+        // Variables to track selection mode
+        let selectionMode = false;
+        let selectedItems = [];
+
+        // Remove item button
+        document.getElementById('removeItemBtn').addEventListener('click', function() {
+            if (selectionMode) {
+                // If already in selection mode, show confirmation dialog
+                if (selectedItems.length > 0) {
+                    showRemoveConfirmationModal();
+                } else {
+                    alert('Please select at least one item to remove');
+                }
+            } else {
+                // Enter selection mode
+                enterSelectionMode();
+            }
+        });
+
+        // Function to enter selection mode
+        function enterSelectionMode() {
+            selectionMode = true;
+            selectedItems = [];
+            
+            // Change button text
+            document.getElementById('removeItemBtn').textContent = 'Confirm Selection';
+            document.getElementById('removeItemBtn').classList.remove('bg-red-600', 'hover:bg-red-700');
+            document.getElementById('removeItemBtn').classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+            
+            // Add a cancel button next to the remove button
+            const cancelBtn = document.createElement('button');
+            cancelBtn.id = 'cancelSelectionBtn';
+            cancelBtn.className = 'px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors mr-2';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.addEventListener('click', exitSelectionMode);
+            
+            document.getElementById('removeItemBtn').parentNode.insertBefore(cancelBtn, document.getElementById('removeItemBtn'));
+            
+            // Add selection circles to each item
+            const tableRows = document.querySelectorAll('#menuItemsTable tbody tr');
+            tableRows.forEach(row => {
+                // Get the item ID from the row
+                const editButton = row.querySelector('button[onclick^="editItem"]');
+                const itemId = editButton.getAttribute('onclick').match(/'([^']+)'/)[1];
+                
+                // Create selection circle
+                const selectionCell = document.createElement('td');
+                selectionCell.className = 'px-6 py-4 w-8';
+                selectionCell.innerHTML = `
+                    <div class="w-6 h-6 border-2 border-gray-400 rounded-full cursor-pointer hover:bg-gray-200" 
+                         data-item-id="${itemId}"></div>
+                `;
+                
+                // Add click event to the selection circle
+                selectionCell.querySelector('div').addEventListener('click', function() {
+                    this.classList.toggle('bg-red-500');
+                    this.classList.toggle('border-red-500');
+                    this.classList.toggle('border-gray-400');
+                    
+                    // Update selected items array
+                    const itemId = this.getAttribute('data-item-id');
+                    if (this.classList.contains('bg-red-500')) {
+                        if (!selectedItems.includes(itemId)) {
+                            selectedItems.push(itemId);
+                        }
+                    } else {
+                        selectedItems = selectedItems.filter(id => id !== itemId);
+                    }
+                });
+                
+                // Insert at the beginning of the row
+                row.insertBefore(selectionCell, row.firstChild);
+            });
+            
+            // Add header for selection column
+            const headerRow = document.querySelector('#menuItemsTable thead tr');
+            const selectHeader = document.createElement('th');
+            selectHeader.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-8';
+            selectHeader.textContent = 'Select';
+            headerRow.insertBefore(selectHeader, headerRow.firstChild);
+        }
+
+        // Function to exit selection mode
+        function exitSelectionMode() {
+            selectionMode = false;
+            selectedItems = [];
+            
+            // Reset button text and style
+            document.getElementById('removeItemBtn').textContent = 'Remove Item';
+            document.getElementById('removeItemBtn').classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+            document.getElementById('removeItemBtn').classList.add('bg-red-600', 'hover:bg-red-700');
+            
+            // Remove cancel button
+            const cancelBtn = document.getElementById('cancelSelectionBtn');
+            if (cancelBtn) {
+                cancelBtn.remove();
+            }
+            
+            // Remove selection circles
+            document.querySelectorAll('#menuItemsTable tbody tr td:first-child').forEach(cell => {
+                cell.remove();
+            });
+            
+            // Remove header for selection column
+            const selectHeader = document.querySelector('#menuItemsTable thead tr th:first-child');
+            if (selectHeader) {
+                selectHeader.remove();
+            }
+            
+            // Reload table to restore original state
+            loadMenuItems();
+        }
+
+        // Function to show removal confirmation modal
+        function showRemoveConfirmationModal() {
+            // Create a modal with confirmation
+            const modal = document.createElement('div');
+            modal.id = 'removeConfirmationModal';
+            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full';
+            modal.innerHTML = `
+                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                    <div class="mt-3">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Removal</h3>
+                        <p class="text-sm text-red-500 mb-4">Warning: You are about to remove ${selectedItems.length} item(s). This action cannot be undone.</p>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" id="cancelRemoveConfirmBtn" 
+                                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="button" id="confirmRemoveConfirmBtn" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                Remove Items
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listeners for the buttons
+            document.getElementById('cancelRemoveConfirmBtn').addEventListener('click', function() {
+                document.getElementById('removeConfirmationModal').remove();
+            });
+            
+            document.getElementById('confirmRemoveConfirmBtn').addEventListener('click', async function() {
+                let successCount = 0;
+                let errorCount = 0;
+                
+                // Process each selected item
+                for (const itemId of selectedItems) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/menu-items/${itemId}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        if (response.ok) {
+                            successCount++;
+                        } else {
+                            errorCount++;
+                            console.error(`Failed to delete item ${itemId}: ${response.statusText}`);
+                        }
+                    } catch (error) {
+                        errorCount++;
+                        console.error(`Error deleting item ${itemId}: ${error.message}`);
+                    }
+                }
+                
+                // Close the modal and exit selection mode
+                document.getElementById('removeConfirmationModal').remove();
+                exitSelectionMode();
+                
+                // Reload the items
+                loadMenuItems();
+                
+                // Show result message
+                if (errorCount === 0) {
+                    alert(`Successfully removed ${successCount} item(s)`);
+                } else {
+                    alert(`Removed ${successCount} item(s), but encountered errors with ${errorCount} item(s)`);
+                }
+            });
+        }
+
+        console.log('Kitchen page loaded');
+        
+        // Check if the DOM has loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded');
+            
+            // Check if we can find key elements
+            console.log('Add Item button exists:', document.getElementById('addItemBtn') !== null);
+            console.log('Menu Items Table exists:', document.getElementById('menuItemsTable') !== null);
+            
+            // Image debugging
+            window.addEventListener('error', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    console.error('Image load error:', e.target.src);
+                    // Try to load the image directly in a new tab to check permissions/paths
+                    console.log('Image path check:', e.target.src);
+                }
+            }, true);
+        });
+    </script>
+</body>
+</html>

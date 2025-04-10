@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bill - Manwah Restaurant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-2 py-4 max-w-2xl">
+        <!-- Loading indicator -->
+        <div id="loadingIndicator" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-4 rounded-lg shadow-lg text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                <p class="text-gray-700">Loading your bill...</p>
+            </div>
+        </div>
+
+        <!-- Error message -->
+        <div id="errorContainer" class="hidden bg-white rounded-lg shadow-lg p-6 text-center">
+            <h2 class="text-xl text-red-600 mb-4">Error Loading Bill</h2>
+            <p id="errorMessage" class="text-gray-700 mb-4">Unable to load bill details.</p>
+            <a href="/" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg">
+                Return to Home
+            </a>
+        </div>
+
+        <div id="billContainer" class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-blue-600 text-white">
+                <!-- Top header with restaurant name and home link -->
+                <div class="flex justify-between items-center px-4 py-3">
+                    <h1 class="text-xl font-bold">Manwah Restaurant</h1>
+                    <a href="/" class="text-white hover:text-gray-200 flex items-center">
+                        <i class="fas fa-home mr-1"></i> Home
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Sub-header with table and order information -->
+            <div class="px-4 py-2 flex justify-end bg-gray-100 border-b border-gray-200">
+                <div class="flex items-center">
+                    <div class="text-center mr-4 px-3 py-1 bg-blue-600 text-white rounded">
+                        <p class="text-sm font-semibold">Table <span id="tableNumber">--</span></p>
+                    </div>
+                    <div class="text-center px-3 py-1 bg-gray-700 text-white rounded">
+                        <p class="text-sm">Order #<span id="orderId">------</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4">
+                <div class="mb-3 flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-600" id="billDate">--</p>
+                        <p class="text-sm text-gray-600" id="billTime">--</p>
+                    </div>
+                    <div>
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-600 rounded-full text-xs font-medium" id="paymentStatus">
+                            <i class="fas fa-hourglass-half mr-1"></i> --
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="border-t border-b border-gray-200 py-3 mb-3">
+                    <h2 class="text-lg font-semibold mb-2">Order Details</h2>
+                    
+                    <div class="space-y-2" id="billItems">
+                        <!-- Items will be dynamically populated here -->
+                        <div class="flex items-center justify-center text-gray-500 p-4">
+                            <p>Loading items...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-1 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <p class="text-gray-600">Subtotal</p>
+                        <p class="font-medium" id="subtotal">$0.00</p>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <p class="text-gray-600">Tax (7%)</p>
+                        <p class="font-medium" id="tax">$0.00</p>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold pt-1 border-t border-gray-200">
+                        <p>Total</p>
+                        <p id="total">$0.00</p>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-2">Thank you for dining with us!</p>
+                    <button id="paymentButton" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition duration-200">
+                        Request Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification components -->
+    <div id="successMessage" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300 hidden">
+        Payment request sent successfully!
+    </div>
+    
+    <div id="errorMessage" class="fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300 hidden">
+        Error processing your request
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script type="module" src="/static/js/customer-bill.js"></script>
+</body>
+</html> 

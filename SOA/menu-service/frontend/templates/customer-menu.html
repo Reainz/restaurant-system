@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Menu - Manwah Restaurant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add base64 favicon to prevent 404 errors -->
+    <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD//wD/AAAA/wD/AP//AAD///8A//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8=" type="image/x-icon">
+    <style>
+        .menu-item {
+            transition: transform 0.2s ease;
+        }
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Top navigation -->
+    <nav class="bg-gray-800 text-white p-8">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold">Manwah Restaurant</h1>
+                <div class="space-x-8">
+                    <a href="/" class="text-xl hover:text-gray-300">Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex">
+            <!-- Sidebar Categories - Reduced width -->
+            <div class="w-40 bg-white shadow-lg">
+                <div class="p-3">
+                    <nav id="category-nav" class="space-y-2">
+                        <!-- Categories will be loaded dynamically -->
+                        <div class="animate-pulse">
+                            <div class="h-10 bg-gray-200 rounded mb-2"></div>
+                            <div class="h-10 bg-gray-200 rounded mb-2"></div>
+                            <div class="h-10 bg-gray-200 rounded"></div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content - Expanded -->
+            <div class="flex-1 overflow-auto">
+                <!-- Content Header -->
+                <div class="bg-white shadow-sm sticky top-0 z-10">
+                    <div class="px-4 sm:px-6 py-4 flex justify-between items-center">
+                        <div class="flex space-x-4">
+                            <button id="normal-plan" class="px-6 py-2 bg-blue-600 text-white rounded-lg">À La Carte</button>
+                            <button id="buffet-plan" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Buffet</button>
+                        </div>
+                        <div class="flex items-center space-x-2 text-gray-600">
+                            <label for="table-select">Table:</label>
+                            <select id="table-select" class="font-semibold py-1 px-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12" selected>12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Items Grid -->
+                <div class="px-4 sm:px-6 py-4">
+                    <div id="menu-sections">
+                        <!-- Menu sections will be loaded dynamically -->
+                        <div class="animate-pulse">
+                            <div class="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                                <div class="h-80 bg-gray-200 rounded"></div>
+                                <div class="h-80 bg-gray-200 rounded"></div>
+                                <div class="h-80 bg-gray-200 rounded"></div>
+                                <div class="h-80 bg-gray-200 rounded"></div>
+                                <div class="h-80 bg-gray-200 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shopping Cart Sidebar - Reduced width -->
+            <div class="w-64 bg-white shadow-lg">
+                <div class="p-3 h-full flex flex-col">
+                    <h2 class="text-xl font-bold text-gray-800 mb-3">Your Cart</h2>
+                    <div id="cart-items" class="flex-1 overflow-auto space-y-2 mb-3" style="max-height: 60vh;">
+                        <!-- Cart items will be loaded dynamically -->
+                    </div>
+                    <div class="border-t pt-3 sticky bottom-0 bg-white">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-semibold">Total:</span>
+                            <span id="cart-total" class="font-semibold">0 ₫</span>
+                        </div>
+                        <button id="complete-order" class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Complete Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300">
+        Item added to cart
+    </div>
+
+    <script>
+        // Constants
+        const API_BASE_URL = '/api';
+        let currentPlan = 'a-la-carte';
+        let cart = [];
+
+        // DOM Elements
+        const categoryNav = document.getElementById('category-nav');
+        const menuSections = document.getElementById('menu-sections');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        const completeOrderBtn = document.getElementById('complete-order');
+        const normalPlanBtn = document.getElementById('normal-plan');
+        const buffetPlanBtn = document.getElementById('buffet-plan');
+        const toast = document.getElementById('toast');
+        const tableSelect = document.getElementById('table-select');
+
+        // Fetch menu categories
+        async function fetchCategories() {
+            try {
+                console.log("Fetching categories from:", `${API_BASE_URL}/menu-categories`);
+                const response = await fetch(`${API_BASE_URL}/menu-categories`);
+                const data = await response.json();
+                console.log("Categories data:", data);
+                return data; // Use the array directly
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                return [];
+            }
+        }
+
+        // Fetch menu items
+        async function fetchMenuItems() {
+            try {
+                console.log("Fetching menu items from:", `${API_BASE_URL}/menu-items`);
+                const response = await fetch(`${API_BASE_URL}/menu-items`);
+                const items = await response.json();
+                console.log("Received menu items:", items);
+                console.log("Current plan:", currentPlan);
+                
+                // Check if Seafood Deluxe Hot Pot exists
+                const hasSeafoodHotPot = items.some(item => 
+                    item.name && item.name.includes("Seafood") && item.name.includes("Hot Pot")
+                );
+                console.log("Has Seafood Hot Pot:", hasSeafoodHotPot);
+                
+                if (hasSeafoodHotPot) {
+                    console.log("Found Seafood Hot Pot item");
+                    // Make sure the image URL is set
+                    items.forEach(item => {
+                        if (item.name && item.name.includes("Seafood") && item.name.includes("Hot Pot")) {
+                            item.image_url = "seafood-deluxe-hot-pot.jpg";
+                            item.available = true; // Ensure it's available
+                            console.log("Set Seafood Hot Pot image:", item.image_url);
+                        }
+                    });
+                }
+                
+                const filteredItems = items.filter(item => item.menu_type === currentPlan);
+                console.log("Filtered items:", filteredItems);
+                return filteredItems;
+            } catch (error) {
+                console.error('Error fetching menu items:', error);
+                return [];
+            }
+        }
+
+        // Render categories
+        async function renderCategories() {
+            const categories = await fetchCategories();
+            console.log("Categories to render:", categories);
+            if (!categories || !Array.isArray(categories)) {
+                console.error("Invalid categories data:", categories);
+                return;
+            }
+            
+            categoryNav.innerHTML = categories.map(category => `
+                <a href="#${category.id.toLowerCase()}" 
+                   class="block py-3 px-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
+                    ${category.name}
+                </a>
+            `).join('');
+        }
+
+        // Render menu items
+        async function renderMenuItems() {
+            const items = await fetchMenuItems();
+            
+            // Log items with image URLs for debugging
+            console.log("Items to render:", items.length);
+            items.forEach((item, index) => {
+                console.log(`Item ${index+1}: ${item.name} | Category: ${item.category} | Type: ${item.menu_type} | Available: ${item.available}`);
+                if (item.name.includes("Seafood")) {
+                    console.log("SEAFOOD ITEM DETAILS:", JSON.stringify(item));
+                }
+            });
+            
+            const itemsByCategory = items.reduce((acc, item) => {
+                if (!acc[item.category]) {
+                    acc[item.category] = [];
+                }
+                
+                // Special handling for Seafood Deluxe Hot Pot
+                if (item.name.includes("Seafood") && item.name.includes("Hot Pot")) {
+                    console.log("Adding Seafood Deluxe Hot Pot to category:", item.category);
+                }
+                
+                acc[item.category].push(item);
+                return acc;
+            }, {});
+
+            menuSections.innerHTML = Object.entries(itemsByCategory).map(([category, items]) => {
+                console.log(`Rendering category: ${category} with ${items.length} items`);
+                
+                // Special check for Seafood Hot Pot in MAIN_DISHES
+                if (category === 'MAIN_DISHES') {
+                    const hasSeafood = items.some(item => item.name.includes('Seafood') && item.name.includes('Hot Pot'));
+                    console.log(`MAIN_DISHES has Seafood Hot Pot: ${hasSeafood}`);
+                }
+                
+                return `
+                <section id="${category.toLowerCase()}" class="mb-12">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">${category.replace('_', ' ')}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${items.map(item => {
+                            console.log(`Rendering item: ${item.name}`);
+                            // Special debug logging for Seafood Deluxe Hot Pot
+                            if (item.name && item.name.includes("Seafood") && item.name.includes("Hot Pot")) {
+                                console.log("SEAFOOD HOT POT DETAILS:", JSON.stringify(item));
+                                console.log("Image URL:", item.image_url);
+                                // Return direct HTML for Seafood Hot Pot with hardcoded image path
+                                return `
+                                <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                                    <img src="/static/images/seafood-deluxe-hot-pot.jpg" alt="${item.name}" class="w-full h-48 object-cover">
+                                    <div class="p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="text-lg font-semibold">${item.name}</h3>
+                                            <span class="text-green-600 font-semibold">${item.price.toLocaleString()} ₫</span>
+                                        </div>
+                                        <p class="text-gray-600 text-sm mb-4">${item.description}</p>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-green-600">Available</span>
+                                            <button 
+                                                onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})"
+                                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                                Add to Cart
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            }
+                            return `
+                            <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                                ${item.name && item.name.includes("Seafood") && item.name.includes("Hot Pot") 
+                                  ? `<img src="/static/images/seafood-deluxe-hot-pot.jpg" alt="${item.name}" class="w-full h-48 object-cover">` 
+                                  : item.image_url 
+                                    ? `<img src="${item.image_url.startsWith('/static/') ? item.image_url : `/static/images/${item.image_url}`}" alt="${item.name}" class="w-full h-48 object-cover" 
+                                        onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDwhLS0gQ3JlYXRlZCB3aXRoIFN2Z0NvbnZlcnQuY29tIC0tPgogPGc+CiAgPHRpdGxlPkJhY2tncm91bmQ8L3RpdGxlPgogIDxyZWN0IGZpbGw9IiNlNWU1ZTUiIGlkPSJjYW52YXNfYmFja2dyb3VuZCIgaGVpZ2h0PSIyMDAiIHdpZHRoPSIyMDAiIHk9IjAiIHg9IjAiLz4KICA8ZyBkaXNwbGF5PSJub25lIiBpZD0iY2FudmFzR3JpZCI+CiAgIDxnIGRpc3BsYXk9ImlubGluZSI+CiAgICA8bGluZSB5Mj0iMTAiIHkyPSIxMCIgeDE9IjAiIHkxPSIxMCIgc3Ryb2tlLXdpZHRoPSIwLjI1IiBzdHJva2U9IiNmZmYiLz4KICAgPC9nPgogIDwvZz4KIDxnIGZvbnQtc2l6ZT0iMTgiIG9wYWNpdHk9IjAuOSI+CiAgPHRleHQgZm9udC1mYW1pbHk9IlNhbnMtc2VyaWYiIGZvbnQtc3R5bGU9Im5vcm1hbCIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjAiIHN0cm9rZS1kYXNoYXJyYXk9Im51bGwiIHN0cm9rZS1saW5lam9pbj0ibnVsbCIgc3Ryb2tlLWxpbmVjYXA9Im51bGwiIGZpbGw9IiM2NjY2NjYiIHg9IjUwIiB5PSIxMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiPk5vIEltYWdlPC90ZXh0PgogIDx0ZXh0IGZvbnQtZmFtaWx5PSJTYW5zLXNlcmlmIiBmb250LXN0eWxlPSJub3JtYWwiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIwIiBzdHJva2UtZGFzaGFycmF5PSJudWxsIiBzdHJva2UtbGluZWpvaW49Im51bGwiIHN0cm9rZS1saW5lY2FwPSJudWxsIiBmaWxsPSIjNjY2NjY2IiB4PSI1MCIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE4Ij5BdmFpbGFibGU8L3RleHQ+CiA8L2c+Cjwvc3ZnPg=='; console.log('Image error handled for ' + this.alt);">` 
+                                    : `<div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">No Image Available</div>`
+                                }
+                                <div class="p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="text-lg font-semibold">${item.name}</h3>
+                                        <span class="text-green-600 font-semibold">${item.price.toLocaleString()} ₫</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm mb-4">${item.description}</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm ${item.available ? 'text-green-600' : 'text-red-600'}">
+                                            ${item.available ? 'Available' : 'Unavailable'}
+                                        </span>
+                                        <button 
+                                            onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})"
+                                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            ${!item.available ? 'disabled' : ''}>
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `}).join('')}
+                    </div>
+                </section>
+            `}).join('');
+        }
+
+        // Cart functions
+        function addToCart(item) {
+            const existingItem = cart.find(cartItem => cartItem.id === item.id);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+            updateCart();
+            showToast(`${item.name} added to cart`);
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCart();
+        }
+
+        function updateQuantity(itemId, delta) {
+            const item = cart.find(item => item.id === itemId);
+            if (item) {
+                item.quantity = Math.max(0, item.quantity + delta);
+                if (item.quantity === 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+
+        function updateCart() {
+            cartItemsContainer.innerHTML = cart.map(item => `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-semibold">${item.name}</h3>
+                        <p class="text-gray-600">${(item.price * item.quantity).toLocaleString()} ₫</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateQuantity('${item.id}', -1)" class="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity('${item.id}', 1)" class="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `${total.toLocaleString()} ₫`;
+            completeOrderBtn.disabled = cart.length === 0;
+        }
+
+        // Show toast notification
+        function showToast(message, bgColor = 'bg-green-500') {
+            // Remove any existing classes
+            toast.className = toast.className
+                .replace(/bg-\w+-\d+/g, '')
+                .trim();
+                
+            // Add the specified background color
+            toast.classList.add(bgColor);
+            
+            // Set the message
+            toast.textContent = message;
+            
+            // Show the toast
+            toast.classList.remove('translate-y-full', 'opacity-0');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-y-full', 'opacity-0');
+            }, 3000);
+        }
+
+        // Event Listeners
+        normalPlanBtn.addEventListener('click', () => {
+            currentPlan = 'a-la-carte';
+            normalPlanBtn.classList.replace('bg-gray-200', 'bg-blue-600');
+            normalPlanBtn.classList.replace('text-gray-700', 'text-white');
+            buffetPlanBtn.classList.replace('bg-blue-600', 'bg-gray-200');
+            buffetPlanBtn.classList.replace('text-white', 'text-gray-700');
+            renderMenuItems();
+        });
+
+        buffetPlanBtn.addEventListener('click', () => {
+            currentPlan = 'buffet';
+            buffetPlanBtn.classList.replace('bg-gray-200', 'bg-blue-600');
+            buffetPlanBtn.classList.replace('text-gray-700', 'text-white');
+            normalPlanBtn.classList.replace('bg-blue-600', 'bg-gray-200');
+            normalPlanBtn.classList.replace('text-white', 'text-gray-700');
+            renderMenuItems();
+        });
+
+        completeOrderBtn.addEventListener('click', async () => {
+            try {
+                const tableIdFromSelect = tableSelect.value; // Get value from dropdown (e.g., "12")
+                console.log(`[customer-menu.html] Initial table_id from select: ${tableIdFromSelect}`);
+
+                // --- START: Format table_id --- 
+                let formattedTableId = tableIdFromSelect;
+                if (!formattedTableId.startsWith('T') && /^[0-9]+$/.test(formattedTableId)) {
+                    formattedTableId = `T${formattedTableId}`;
+                    console.log(`[customer-menu.html] Prepended 'T'. Formatted table_id is now: ${formattedTableId}`);
+                } 
+                // Check if the format is now correct (T followed by digits) or if it was invalid initially
+                else if (!formattedTableId.startsWith('T') || !/^[0-9]+$/.test(formattedTableId.substring(1))) {
+                    console.error(`[customer-menu.html] Invalid table_id format found: ${tableIdFromSelect}`);
+                    showToast(`Invalid Table ID format: ${tableIdFromSelect}. Expected format like '12' or 'T12'.`, 'bg-red-500');
+                    return;
+                } else {
+                    console.log(`[customer-menu.html] table_id already correctly formatted: ${formattedTableId}`); 
+                }
+                // --- END: Format table_id ---
+
+                console.log(`[customer-menu.html] Using table_id for payload: ${formattedTableId}`);
+
+                const orderData = {
+                    table_id: formattedTableId, // <-- Use the formatted ID
+                    items: cart.map(item => ({
+                        item_id: item.id,
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.price,
+                        notes: '',
+                        status: 'pending'
+                    })),
+                    special_instructions: ''
+                };
+
+                // Log the order data for debugging
+                console.log('[customer-menu.html] Sending order data:', JSON.stringify(orderData));
+
+                // Target the Order Service API directly
+                const orderServiceUrl = 'http://localhost:8002/api/orders'; 
+                console.log(`[customer-menu.html] Sending POST to: ${orderServiceUrl}`);
+
+                const response = await fetch(orderServiceUrl, { // <-- Send directly to order-service
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                console.log(`[customer-menu.html] Response status: ${response.status}`);
+
+                if (!response.ok) {
+                    let errorDetail = `Order API request failed with status ${response.status}`;
+                    try {
+                        const errorData = await response.json(); 
+                        console.error('[customer-menu.html] Order API error response:', errorData);
+                        errorDetail = errorData.detail || errorDetail;
+                        if (typeof errorDetail === 'object') { // Handle nested errors
+                            errorDetail = JSON.stringify(errorDetail);
+                        }
+                    } catch (e) {
+                         const errorText = await response.text();
+                         console.error('[customer-menu.html] Order API error text (non-JSON):', errorText);
+                         errorDetail = errorText || errorDetail;
+                    }
+                    throw new Error(errorDetail);
+                }
+
+                const result = await response.json();
+                console.log('[customer-menu.html] Order API success response:', result);
+                
+                if (result && result.order_id) { // Check result directly from order-service
+                    // Show success message and clear cart
+                    showToast('Order placed successfully!', 'bg-green-500');
+                    cart = [];
+                    updateCart();
+                    
+                    // Redirect to a confirmation page or show confirmation dialog
+                    setTimeout(() => {
+                        alert(`Order #${result.order_id} placed successfully! Your order has been sent to the kitchen.`);
+                        // Redirect to order service to see the order status
+                        const customerOrderStatusUrl = 'http://localhost:8002/customer'; 
+                        window.open(`${customerOrderStatusUrl}?table_id=${formattedTableId}&order_id=${result.order_id}`, '_blank');
+                    }, 1000);
+                } else {
+                     console.error('[customer-menu.html] Order successful but response lacked order_id:', result);
+                    throw new Error('Order placement succeeded but response did not contain order_id.');
+                }
+            } catch (error) {
+                console.error('[customer-menu.html] Error completing order:', error);
+                showToast(`Failed to place order: ${error.message}`, 'bg-red-500');
+            }
+        });
+
+        // Initialize
+        renderCategories();
+        renderMenuItems();
+        updateCart();
+    </script>
+</body>
+</html>

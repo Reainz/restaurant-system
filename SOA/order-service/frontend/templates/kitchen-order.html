@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Order Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            z-index: 50;
+        }
+        .main-content {
+            padding-bottom: 5rem;
+        }
+        .compact-card {
+            padding: 0.75rem;
+            transition: all 0.2s;
+        }
+        .compact-card:hover {
+            transform: translateY(-2px);
+        }
+        .order-queue-container {
+            max-height: calc(100vh - 270px);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Top navigation -->
+    <nav class="bg-gray-800 text-white p-8">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold">Manwah Restaurant</h1>
+                <div class="space-x-8">
+                    <a href="/" class="text-xl hover:text-gray-300">Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-4 main-content">
+        <!-- Order Queue Summary -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Kitchen Dashboard</h1>
+                <div class="text-sm text-gray-600">
+                    Average Wait Time: <span id="avgWaitTime" class="font-semibold">0:00</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-5 gap-2">
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <h3 class="text-xs font-medium text-blue-700">New Orders</h3>
+                    <p id="newOrdersCount" class="text-xl font-bold text-blue-600">0</p>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-lg">
+                    <h3 class="text-xs font-medium text-yellow-700">In Progress</h3>
+                    <p id="inProgressCount" class="text-xl font-bold text-yellow-600">0</p>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg">
+                    <h3 class="text-xs font-medium text-green-700">Ready</h3>
+                    <p id="readyCount" class="text-xl font-bold text-green-600">0</p>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-lg">
+                    <h3 class="text-xs font-medium text-purple-700">Completed</h3>
+                    <p id="completedCount" class="text-xl font-bold text-purple-600">0</p>
+                </div>
+                <div class="bg-red-50 p-3 rounded-lg">
+                    <h3 class="text-xs font-medium text-red-700">Delayed</h3>
+                    <p id="delayedCount" class="text-xl font-bold text-red-600">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Queue and Details Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Order Queue -->
+            <div class="md:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-lg font-semibold">Order Queue</h2>
+                        <div class="flex space-x-2">
+                            <select id="statusFilter" class="p-1 text-sm border rounded text-xs">
+                                <option value="active">Active Orders</option>
+                                <option value="all">All Statuses</option>
+                                <option value="received">Received</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="paused">Paused</option>
+                                <option value="ready">Ready</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Active Orders Container -->
+                    <div id="orderQueueContainer" class="order-queue-container">
+                        <div id="pendingOrders" class="space-y-2 mb-4">
+                            <!-- Pending orders (received, in-progress) will be dynamically added here -->
+                            <p class="text-gray-500 text-center py-4">Loading pending orders...</p>
+                        </div>
+                        <div id="preparedOrders" class="space-y-2">
+                            <!-- Prepared orders (ready) will be dynamically added here -->
+                             <p class="text-gray-500 text-center py-4">Loading prepared orders...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Order History Container (hidden by default) -->
+                    <div id="orderHistory" class="space-y-2 order-queue-container hidden">
+                        <!-- Ready and completed orders will be displayed here -->
+                        <p class="text-gray-500 text-center py-4">No order history</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Details -->
+            <div class="md:col-span-2">
+                <div id="orderDetailPanel" class="bg-white rounded-lg shadow-md p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold">Order Details</h2>
+                        <div class="text-sm text-gray-600">
+                            Order Time: <span id="orderTime" class="font-semibold">--:--</span>
+                        </div>
+                    </div>
+
+                    <!-- Order Information -->
+                    <div class="grid grid-cols-3 gap-2 mb-3 text-sm">
+                        <div>
+                            <span class="text-gray-600">Order ID:</span>
+                            <span id="orderId" class="font-semibold ml-1">---</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Table Number:</span>
+                            <span id="tableNumber" class="font-semibold ml-1">--</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Status:</span>
+                            <span id="orderStatus" class="font-semibold ml-1 px-2 py-0.5 rounded text-xs">---</span>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="mb-3">
+                        <h3 class="text-md font-medium mb-2">Order Items</h3>
+                        <div id="orderItems" class="space-y-2 max-h-[calc(100vh-460px)] overflow-y-auto">
+                            <!-- Order items will be dynamically added here -->
+                            <p class="text-gray-500">Select an order to view items</p>
+                        </div>
+                    </div>
+
+                    <!-- Special Instructions -->
+                    <div class="mb-3">
+                        <h3 class="text-md font-medium mb-1">Special Instructions</h3>
+                        <div id="specialInstructions" class="p-2 bg-gray-50 rounded-lg text-gray-700 text-sm">
+                            No special instructions
+                        </div>
+                    </div>
+
+                    <!-- Kitchen Notes -->
+                    <div class="mb-3">
+                        <h3 class="text-md font-medium mb-1">Kitchen Notes</h3>
+                        <textarea id="kitchenNotes" class="w-full p-2 border rounded-lg text-sm" rows="2" placeholder="Add preparation notes here..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons Container -->
+                <div id="detailActionButtons" class="mt-4">
+                     <div class="grid grid-cols-4 gap-3">
+                        <button id="startAllBtn" class="bg-blue-500 text-white font-medium px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            Start All Items
+                        </button>
+                        <button id="markReadyBtn" class="bg-green-500 text-white font-medium px-4 py-2 rounded hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            Mark Ready
+                        </button>
+                        <button id="pauseOrderBtn" class="bg-yellow-500 text-white font-medium px-4 py-2 rounded hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            Pause Order
+                        </button>
+                        <button id="cancelOrderBtn" class="bg-red-500 text-white font-medium px-4 py-2 rounded hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            Cancel Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification" class="fixed top-4 right-4 max-w-md transform transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md">
+            <div class="flex">
+                <div class="py-1">
+                    <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p id="notificationMessage">Operation successful!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ (url_for('static', path='/js/config.js') ~ '?v=3') if request else '../js/config.js?v=3' }}"></script>
+    <script src="{{ (url_for('static', path='/js/api-config.js') ~ '?v=3') if request else '../js/api-config.js?v=3' }}"></script>
+    <script src="{{ (url_for('static', path='/js/kitchen-order.js') ~ '?v=3') if request else '../js/kitchen-order.js?v=3' }}"></script>
+    <!-- Fallback for browsers that don't support ES modules -->
+    <script nomodule>
+        console.log('ES modules not supported. Using fallback initialization.');
+        // Initialize page without modules
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch all orders
+            fetch('/api/orders')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Loaded orders for kitchen:', data);
+                    
+                    // Create order display for kitchen
+                    if (data.orders) {
+                        // Filter orders to show only those in relevant statuses
+                        const relevantOrders = data.orders.filter(order => 
+                            ['received', 'in-progress'].includes(order.status)
+                        );
+                        
+                        const pendingOrdersContainer = document.getElementById('pendingOrders');
+                        const inProgressOrdersContainer = document.getElementById('inProgressOrders');
+                        
+                        if (pendingOrdersContainer && inProgressOrdersContainer) {
+                            pendingOrdersContainer.innerHTML = '';
+                            inProgressOrdersContainer.innerHTML = '';
+                            
+                            // Process each order
+                            relevantOrders.forEach(order => {
+                                const orderElement = createOrderElement(order);
+                                
+                                if (order.status === 'received') {
+                                    pendingOrdersContainer.appendChild(orderElement);
+                                } else if (order.status === 'in-progress') {
+                                    inProgressOrdersContainer.appendChild(orderElement);
+                                }
+                            });
+                            
+                            // Show empty states if needed
+                            if (pendingOrdersContainer.children.length === 0) {
+                                pendingOrdersContainer.innerHTML = 
+                                    '<div class="text-center py-8 text-gray-500">No pending orders</div>';
+                            }
+                            
+                            if (inProgressOrdersContainer.children.length === 0) {
+                                inProgressOrdersContainer.innerHTML = 
+                                    '<div class="text-center py-8 text-gray-500">No orders in progress</div>';
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching orders for kitchen:', error);
+                    document.getElementById('pendingOrders').innerHTML = 
+                        '<div class="text-center py-8 text-red-500">Error loading orders</div>';
+                    document.getElementById('inProgressOrders').innerHTML = 
+                        '<div class="text-center py-8 text-red-500">Error loading orders</div>';
+                });
+                
+            // Helper function to create an order element
+            function createOrderElement(order) {
+                const orderEl = document.createElement('div');
+                orderEl.className = 'bg-white p-4 rounded-lg shadow-md mb-4';
+                orderEl.setAttribute('data-order-id', order.order_id);
+                
+                const orderHeader = document.createElement('div');
+                orderHeader.className = 'flex justify-between items-center mb-2';
+                
+                const orderTitle = document.createElement('h3');
+                orderTitle.className = 'text-lg font-semibold';
+                orderTitle.textContent = `Order #${order.order_id.substr(0, 8)}... - Table ${order.table_id}`;
+                
+                const timestamp = document.createElement('span');
+                timestamp.className = 'text-sm text-gray-600';
+                timestamp.textContent = new Date(order.created_at).toLocaleString();
+                
+                orderHeader.appendChild(orderTitle);
+                orderHeader.appendChild(timestamp);
+                orderEl.appendChild(orderHeader);
+                
+                // Create item list
+                if (order.items && order.items.length > 0) {
+                    const itemsList = document.createElement('ul');
+                    itemsList.className = 'divide-y divide-gray-200';
+                    
+                    order.items.forEach((item, index) => {
+                        const itemEl = document.createElement('li');
+                        itemEl.className = 'py-2';
+                        itemEl.innerHTML = `
+                            <div class="flex justify-between">
+                                <div>
+                                    <span class="font-medium">${item.name}</span>
+                                    <span class="text-gray-600 ml-2">x${item.quantity}</span>
+                                </div>
+                                <div>
+                                    <div class="flex">
+                                        <button class="item-ready-btn bg-green-500 text-white px-2 py-1 rounded text-xs mr-1" 
+                                                data-item-index="${index}">
+                                            Ready
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            ${item.notes ? `<p class="text-sm text-gray-600 italic mt-1">${item.notes}</p>` : ''}
+                        `;
+                        
+                        itemsList.appendChild(itemEl);
+                    });
+                    
+                    orderEl.appendChild(itemsList);
+                }
+                
+                // Special instructions
+                if (order.special_instructions) {
+                    const instructionsEl = document.createElement('div');
+                    instructionsEl.className = 'mt-3 p-2 bg-yellow-50 rounded text-sm';
+                    
+                    const instructionsTitle = document.createElement('h4');
+                    instructionsTitle.className = 'font-medium';
+                    instructionsTitle.textContent = 'Special Instructions:';
+                    
+                    const instructionsText = document.createElement('p');
+                    instructionsText.textContent = order.special_instructions;
+                    
+                    instructionsEl.appendChild(instructionsTitle);
+                    instructionsEl.appendChild(instructionsText);
+                    orderEl.appendChild(instructionsEl);
+                }
+                
+                // Action buttons
+                const actionsEl = document.createElement('div');
+                actionsEl.className = 'mt-4 flex justify-end space-x-2';
+                
+                // Different buttons based on status
+                if (order.status === 'received') {
+                    const startBtn = document.createElement('button');
+                    startBtn.className = 'start-order-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600';
+                    startBtn.textContent = 'Start Order';
+                    startBtn.setAttribute('data-order-id', order.order_id);
+                    actionsEl.appendChild(startBtn);
+                } else if (order.status === 'in-progress') {
+                    const readyBtn = document.createElement('button');
+                    readyBtn.className = 'ready-order-btn bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600';
+                    readyBtn.textContent = 'Mark Ready';
+                    readyBtn.setAttribute('data-order-id', order.order_id);
+                    actionsEl.appendChild(readyBtn);
+                }
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'cancel-order-btn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.setAttribute('data-order-id', order.order_id);
+                actionsEl.appendChild(cancelBtn);
+                
+                orderEl.appendChild(actionsEl);
+                
+                return orderEl;
+            }
+            
+            // Add event listeners for start, ready, and cancel buttons
+            document.addEventListener('click', function(event) {
+                // Start order button
+                if (event.target.classList.contains('start-order-btn')) {
+                    const orderId = event.target.getAttribute('data-order-id');
+                    startOrder(orderId);
+                }
+                
+                // Ready order button
+                if (event.target.classList.contains('ready-order-btn')) {
+                    const orderId = event.target.getAttribute('data-order-id');
+                    markOrderReady(orderId);
+                }
+                
+                // Cancel order button
+                if (event.target.classList.contains('cancel-order-btn')) {
+                    const orderId = event.target.getAttribute('data-order-id');
+                    cancelOrder(orderId);
+                }
+                
+                // Item ready button
+                if (event.target.classList.contains('item-ready-btn')) {
+                    const orderId = event.target.closest('[data-order-id]').getAttribute('data-order-id');
+                    const itemIndex = event.target.getAttribute('data-item-index');
+                    markItemReady(orderId, itemIndex);
+                }
+            });
+            
+            // Order status change functions
+            function startOrder(orderId) {
+                updateOrderStatus(orderId, 'in-progress');
+            }
+            
+            function markOrderReady(orderId) {
+                updateOrderStatus(orderId, 'ready');
+            }
+            
+            function cancelOrder(orderId) {
+                updateOrderStatus(orderId, 'cancelled');
+            }
+            
+            function updateOrderStatus(orderId, status) {
+                fetch(`/api/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page to show updated orders
+                        window.location.reload();
+                    } else {
+                        throw new Error(`Failed to update order: ${response.statusText}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating order:', error);
+                    alert(`Error: ${error.message}`);
+                });
+            }
+            
+            function markItemReady(orderId, itemIndex) {
+                console.log(`Marking item ${itemIndex} ready in order ${orderId}`);
+                // In a real app, we would update the item status
+                // For now, just change the button appearance
+                event.target.textContent = 'Done';
+                event.target.classList.remove('bg-green-500');
+                event.target.classList.add('bg-gray-500');
+                event.target.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>

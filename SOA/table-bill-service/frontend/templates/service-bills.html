@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Management - Manwah Restaurant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-6">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">Manwah Restaurant</h1>
+            <div class="flex space-x-2">
+                <a href="/" class="text-blue-600 hover:text-blue-800 ml-4">
+                    <i class="fas fa-home mr-1"></i> Home
+                </a>
+            </div>
+        </header>
+
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Bill Management</h2>
+                <div class="flex space-x-2">
+                    <a href="/tables" class="rounded-full px-4 py-2 bg-white text-gray-600 font-medium">Table Management</a>
+                    <a href="/bills" class="rounded-full px-4 py-2 bg-blue-100 text-blue-600 font-medium">Bill Management</a>
+                </div>
+            </div>
+            
+            <div class="mb-6 flex">
+                <div class="flex space-x-2 mb-4">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center all-bills">
+                        <i class="fas fa-filter mr-2"></i> All Bills
+                    </button>
+                    <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-md flex items-center filter-pending">
+                        <i class="fas fa-hourglass-half mr-2"></i> Pending
+                    </button>
+                    <button class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md flex items-center filter-completed">
+                        <i class="fas fa-check mr-2"></i> Paid
+                    </button>
+                    <div class="flex-grow"></div>
+                    <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md flex items-center filter-by-date">
+                        <i class="fas fa-calendar-alt mr-2"></i> Filter by date
+                    </button>
+                    <!-- REMOVE Create Bill Button -->
+                    <!-- 
+                    <button class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md flex items-center create-bill">
+                        <i class="fas fa-plus mr-2"></i> Create Bill
+                    </button>
+                    -->
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Bills will be dynamically rendered here by the JavaScript -->
+                <div id="loading-placeholder" class="p-6 bg-white rounded-lg shadow-sm text-center">
+                    <i class="fas fa-spinner fa-spin mr-2"></i> Loading bills...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification components (Copied from customer-bill.html) -->
+    <div id="successMessage" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300 hidden z-50">
+        Success!
+    </div>
+    
+    <div id="errorMessage" class="fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300 hidden z-50">
+        Error!
+    </div>
+    <!-- End Notification components -->
+
+    <!-- Date Filter Modal -->
+    <div id="dateFilterModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h3 class="text-lg font-medium mb-4">Filter Bills by Date</h3>
+            <div class="mb-4">
+                <label for="filterDate" class="block text-sm font-medium text-gray-700 mb-1">Select Date:</label>
+                <input type="date" id="filterDate" name="filterDate" 
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancelDateFilter" type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md">
+                    Cancel
+                </button>
+                <button id="applyDateFilter" type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md">
+                    Apply Filter
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- End Date Filter Modal -->
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/bills.js?v=999"></script>
+</body>
+</html> 
