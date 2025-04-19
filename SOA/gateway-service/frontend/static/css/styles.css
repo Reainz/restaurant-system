@@ -24,6 +24,31 @@ body {
     flex-direction: column;
 }
 
+.dashboard-container {
+    min-height: 40vh; /* Makes the content area at least 70% of viewport height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 0;
+}
+
+.continue-section {
+    padding: 80px 0; /* Increased padding */
+}
+
+.role-button {
+    height: 100px; /* Taller buttons */
+    margin-bottom: 30px; /* More space between elements */
+}
+
+.spacer {
+    height: 60px; /* Extra space */
+}
+
+.footer-description {
+    height: 40px; /* Adds some space before and after main content */
+}
+
 main {
     flex: 1;
 }

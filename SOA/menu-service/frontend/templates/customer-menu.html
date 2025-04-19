@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Menu - Manwah Restaurant</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
 
     <style>
+        body {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
         .menu-item {
             transition: transform 0.2s ease;
         }
@@ -26,7 +30,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body>
     <!-- Top navigation -->
     <nav class="bg-gray-800 text-white p-8">
         <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,102 +43,105 @@
         </div>
     </nav>
 
-    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex">
-            <!-- Sidebar Categories - Reduced width -->
-            <div class="w-40 bg-white shadow-lg">
-                <div class="p-3">
-                    <nav id="category-nav" class="space-y-2">
-                        <!-- Categories will be loaded dynamically -->
-                        <div class="animate-pulse">
-                            <div class="h-10 bg-gray-200 rounded mb-2"></div>
-                            <div class="h-10 bg-gray-200 rounded mb-2"></div>
-                            <div class="h-10 bg-gray-200 rounded"></div>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-
-            <!-- Main Content - Expanded -->
-            <div class="flex-1 overflow-auto">
-                <!-- Content Header -->
-                <div class="bg-white shadow-sm sticky top-0 z-10">
-                    <div class="px-4 sm:px-6 py-4 flex justify-between items-center">
-                        <div class="flex space-x-4">
-                            <button id="normal-plan" class="px-6 py-2 bg-blue-600 text-white rounded-lg">À La Carte</button>
-                            <button id="buffet-plan" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Buffet</button>
-                        </div>
-                        <div class="flex items-center space-x-2 text-gray-600">
-                            <label for="table-select">Table:</label>
-                            <select id="table-select" class="font-semibold py-1 px-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12" selected>12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="17">17</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
-                            </select>
-                        </div>
+    <div class="bg-gray-100 min-h-screen">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex">
+                <!-- Sidebar Categories - Reduced width -->
+                <div class="w-40 bg-white shadow-lg">
+                    <div class="p-3">
+                        <nav id="category-nav" class="space-y-2">
+                            <!-- Categories will be loaded dynamically -->
+                            <div class="animate-pulse">
+                                <div class="h-10 bg-gray-200 rounded mb-2"></div>
+                                <div class="h-10 bg-gray-200 rounded mb-2"></div>
+                                <div class="h-10 bg-gray-200 rounded"></div>
+                            </div>
+                        </nav>
                     </div>
                 </div>
-
-                <!-- Menu Items Grid -->
-                <div class="px-4 sm:px-6 py-4">
-                    <div id="menu-sections">
-                        <!-- Menu sections will be loaded dynamically -->
-                        <div class="animate-pulse">
-                            <div class="h-8 bg-gray-200 rounded w-48 mb-6"></div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                                <div class="h-80 bg-gray-200 rounded"></div>
-                                <div class="h-80 bg-gray-200 rounded"></div>
-                                <div class="h-80 bg-gray-200 rounded"></div>
-                                <div class="h-80 bg-gray-200 rounded"></div>
-                                <div class="h-80 bg-gray-200 rounded"></div>
+    
+                <!-- Main Content - Expanded -->
+                <div class="flex-1 overflow-auto">
+                    <!-- Content Header -->
+                    <div class="bg-white shadow-sm sticky top-0 z-10">
+                        <div class="px-4 sm:px-6 py-4 flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <button id="normal-plan" class="px-6 py-2 bg-blue-400 text-white rounded-lg">À La Carte</button>
+                                <button id="buffet-plan" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Buffet</button>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-600">
+                                <label for="table-select">Table:</label>
+                                <select id="table-select" class="font-semibold py-1 px-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12" selected>12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Menu Items Grid -->
+                    <div class="px-4 sm:px-6 py-4">
+                        <div id="menu-sections">
+                            <!-- Menu sections will be loaded dynamically -->
+                            <div class="animate-pulse">
+                                <div class="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                                    <div class="h-80 bg-gray-200 rounded"></div>
+                                    <div class="h-80 bg-gray-200 rounded"></div>
+                                    <div class="h-80 bg-gray-200 rounded"></div>
+                                    <div class="h-80 bg-gray-200 rounded"></div>
+                                    <div class="h-80 bg-gray-200 rounded"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Shopping Cart Sidebar - Reduced width -->
-            <div class="w-64 bg-white shadow-lg">
-                <div class="p-3 h-full flex flex-col">
-                    <h2 class="text-xl font-bold text-gray-800 mb-3">Your Cart</h2>
-                    <div id="cart-items" class="flex-1 overflow-auto space-y-2 mb-3" style="max-height: 60vh;">
-                        <!-- Cart items will be loaded dynamically -->
-                    </div>
-                    <div class="border-t pt-3 sticky bottom-0 bg-white">
-                        <div class="flex justify-between mb-2">
-                            <span class="font-semibold">Total:</span>
-                            <span id="cart-total" class="font-semibold">0 ₫</span>
+    
+                <!-- Shopping Cart Sidebar - Reduced width -->
+                <div class="w-64 bg-white shadow-lg">
+                    <div class="p-3 h-full flex flex-col">
+                        <h2 class="text-xl font-bold text-gray-800 mb-3">Your Cart</h2>
+                        <div id="cart-items" class="flex-1 overflow-auto space-y-2 mb-3" style="max-height: 60vh;">
+                            <!-- Cart items will be loaded dynamically -->
                         </div>
-                        <button id="complete-order" class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                            Complete Order
-                        </button>
+                        <div class="border-t pt-3 sticky bottom-0 bg-white">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Total:</span>
+                                <span id="cart-total" class="font-semibold">0 ₫</span>
+                            </div>
+                            <button id="complete-order" class="w-full py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 disabled:opacity-20 disabled:cursor-not-allowed">
+                                Complete Order
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300">
-        Item added to cart
+        <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full opacity-0 transition-all duration-300">
+            Item added to cart
+        </div>
     </div>
+        
+
 
     <script>
         // Constants
@@ -280,7 +287,7 @@
                                             <span class="text-sm text-green-600">Available</span>
                                             <button 
                                                 onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})"
-                                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                                class="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500">
                                                 Add to Cart
                                             </button>
                                         </div>
@@ -309,7 +316,7 @@
                                         </span>
                                         <button 
                                             onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})"
-                                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            class="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                             ${!item.available ? 'disabled' : ''}>
                                             Add to Cart
                                         </button>

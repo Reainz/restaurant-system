@@ -413,8 +413,12 @@ async def tables_page(request: Request):
     return templates.TemplateResponse("service-tables.html", {"request": request})
 
 @app.get("/bills", response_class=HTMLResponse, include_in_schema=False)
+async def bills_page(request: Request):
+    return templates.TemplateResponse("service-bills.html", {"request": request})
+
+@app.get("/manager-bills", response_class=HTMLResponse, include_in_schema=False)
 async def bills_page(request: Request, _=Depends(auth_middleware)):
-    return templates.TemplateResponse("service-bills.html", {"request": request, "username": request.state.user})
+    return templates.TemplateResponse("manager-bills.html", {"request": request, "username": request.state.user})
 
 @app.get("/customer-bill", response_class=HTMLResponse, include_in_schema=False)
 async def customer_bill_page(request: Request, bill_id: str = Query(...)):

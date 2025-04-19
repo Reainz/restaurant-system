@@ -13,6 +13,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from bson import ObjectId
 from slugify import slugify
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
@@ -29,6 +30,8 @@ FRONTEND_DIR = BASE_DIR / "frontend"
 TEMPLATES_DIR = FRONTEND_DIR / "templates"
 STATIC_DIR = FRONTEND_DIR / "static"
 IMAGES_DIR = STATIC_DIR / "images"
+
+templates = Jinja2Templates(directory=str(BASE_DIR / "frontend" / "templates"))
 
 # Ensure directories exist
 os.makedirs(str(IMAGES_DIR), exist_ok=True)

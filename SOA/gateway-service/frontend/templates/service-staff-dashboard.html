@@ -10,33 +10,38 @@
 
 </head>
 <body>
-    {% include "partials/header.html" %}
+    {% include "partials/main-header.html" %}
 
     <div class="footer-description"></div>
 
-    <section class="continue-section">
-        <div class="container">
-            <h2 class="continue-heading">Service-staff Dashboard</h2>
-            <div class="row justify-content-center">
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <a href="http://localhost:8003/tables" class="role-button btn-service">View Tables</a>
+    <div class="dashboard-container">
+        <section class="continue-section">
+            <div class="container">
+                <h2 class="continue-heading">Service-staff Dashboard</h2>
+                <div class="spacer"></div>
+                <div class="row justify-content-center">
+                    <div class="col-md-3 col-sm-6 mb-4">
+                        <a href="http://localhost:8003/tables" class="role-button btn-service">View Tables</a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-4">
+                        <a href="http://localhost:8000/customer-menu" class="role-button btn-service">View Menus</a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-4">
+                        <a href="http://localhost:8002/service" class="role-button btn-service">View Orders</a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-4">
+                        <a href="http://localhost:8003/bills" class="role-button btn-service">View Bill and Update</a>
+                    </div>
                 </div>
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <a href="http://localhost:8000/customer-menu" class="role-button btn-service">View Menus</a>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <a href="http://localhost:8002/service" class="role-button btn-service">View Orders</a>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <a href="http://localhost:8003/bills" class="role-button btn-service">View Bill and Update</a>
-                </div>
+                <div class="spacer"></div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
+    
 
     <div class="footer-description"></div>
 
-    {% include "partials/help.html" %}
+    <!-- {% include "partials/help.html" %} -->
 
     {% include "partials/footer.html" %}
 

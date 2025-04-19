@@ -7,6 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="/static/images/logo_from_klipartz.png" type="image/png">
     <style>
+        body {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
         .image-container {
             position: relative;
             width: 64px;
@@ -18,6 +21,7 @@
         .image-loading {
             opacity: 0.5;
         }
+
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -36,11 +40,11 @@
     <!-- Main Content -->
     <div>
         <!-- Content Header -->
-        <div class="bg-white shadow-sm">
+        <!-- <div class="bg-white shadow-sm">
             <div class="max-w-screen-2xl mx-auto px-4 py-4">
                 <h1 class="text-2xl font-bold text-gray-800">Kitchen Management</h1>
             </div>
-        </div>
+        </div> -->
 
         <!-- Menu Items Management -->
         <div class="bg-gray-100 py-4">
@@ -48,10 +52,10 @@
                 <div class="flex justify-between items-center">
                     <h2 class="text-xl font-bold text-gray-800">Menu Items</h2>
                     <div class="flex space-x-2">
-                        <button id="removeItemBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        <button id="removeItemBtn" class="px-4 py-2 bg-red-400 text-black rounded-lg hover:bg-red-500 transition-colors">
                             Remove Item
                         </button>
-                        <button id="addItemBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        <button id="addItemBtn" class="px-4 py-2 bg-green-300 text-black rounded-lg hover:bg-green-400 transition-colors">
                             Add New Item
                         </button>
                     </div>
