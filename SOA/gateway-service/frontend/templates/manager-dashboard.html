@@ -19,17 +19,23 @@
             <h2 class="continue-heading">Manager Dashboard</h2>
             <div class="row justify-content-center">
                 <div class="col-md-3 col-sm-6 mb-4">
-                    <a href="/manager" class="role-button btn-admin">Interact as Service Staff</a>
+                    <a href="/service" class="role-button btn-admin">Interact as Service Staff</a>
                 </div>
                 <div class="col-md-3 col-sm-6 mb-4">
                     <a href="/kitchen" class="role-button btn-admin">Interact as Kitchen Staff</a>
                 </div>
                 <div class="col-md-3 col-sm-6 mb-4">
-                    <a href="/service" class="role-button btn-admin">Summarize Bills for current shift</a>
+                    <a href="/error.html" class="role-button btn-admin">Summarize Bills for current shift</a>
                 </div>
                 <div class="col-md-3 col-sm-6 mb-4">
-                    <a href="/manager" class="role-button btn-admin">View Bill History</a>
+                    <a href="http://localhost:8003/bills" class="role-button btn-admin">View Bill History</a>
                 </div>
+            </div>
+
+            <div class="container mt-3 text-end">
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-danger btn-sm custom-logout-btn">Logout</button>
+                </form>
             </div>
         </div>
     </section>
@@ -41,6 +47,14 @@
     {% include "partials/footer.html" %}
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        window.addEventListener("pageshow", function (event) {
+          if (event.persisted || performance.navigation.type === 2) {
+            window.location.reload();
+          }
+        });
+    </script>
 
 </body>
 </html>

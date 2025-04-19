@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="login-body">
+    <div class="parent-container parent-login">
+
+        <div class="visual-container">
+            <img class="align-center login-image" src="/static/images/food.png" alt="Food Image">
+
+            <h3 class="primary-text heading-text align-center">Bienvenue Folk!</h3>
+            <p class="primary-text align-center">Salut! Ça va bien? Eating is essential for evey living species. Don't worry anymore! Our restaurant is here to satisfy you.</p>
+        </div>
+
+        <div class="form-wrapper">
+            <div class="form-container">
+                <h3 class="text-center mb-4 primary-text heading-text">Admin Login</h3>
+
+                <form id="loginForm" action="/login" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label primary-text">Username</label>
+                        <input type="text" class="form-control primary-text black-text" name="username" id="login-username" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label primary-text">Password</label>
+                        <input type="password" class="form-control" name="password" id="login-password" required>
+                    </div>
+
+                    <p class="align-right primary-small-text font-italic" onclick="openForgotPasswordPopup()">
+                        Forgot password?
+                    </p>
+
+                    <button type="submit" class="primary-text white-text btn btn-primary w-100">Login</button>
+
+                    <div class="divider">
+                        <span>Trois</span>
+                    </div>
+
+                    <p class="primary-small-text align-center">
+                        Please login with your admin account.
+                    </p>
+
+                    <!-- <% if (error) { %>
+                        <p class="primary-small-text red-icon align-center"><%= error %></p>
+                    <% } %> -->
+                    
+                    {% if error %}
+                        <p class="primary-small-text red-icon align-center">{{ error }}</p>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="forgotPasswordPopup" class="popup-overlay">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup('forgotPasswordPopup')">&times;</span>
+            <p class="primary-text black-text align-left">Dear user,<br><br>Unfortunately, You have to remember your password. We can't do anything for you in this case.(or anyother case either)<br>But FORTUNATELY, if you totally forgot the password, you can go create a new account. Or do anything else you like. We're always here for you, trying to develop user-centered designs, but just trying only, not doing anything. Any ideas from you, our dear customer, is warmly welcomed, but we will not follow your idea no matter what *^^*.<br>Hope you have best day!<br><br>Yours User-friendly, User-experience-centered developer,<br>Myat</p>
+        </div>
+    </div>
+
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

@@ -1,47 +1,24 @@
 import uvicorn
-import logging
-import os
-from pathlib import Path
-from fastapi import FastAPI, Request, HTTPException
+import uuid
+from fastapi import FastAPI, Depends, HTTPException, Form
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.requests import Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi.templating import Jinja2Templates
-from pathlib import Path
+from starlette.status import HTTP_302_FOUND
 
 
 app = FastAPI(title="Restaurant Gateway Service")
 
-# Mount the static folder
-# app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
 # Set up the Jinja2 templates
 templates = Jinja2Templates(directory="frontend/templates")
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger("gateway-service")
 
-# Define paths
-BASE_DIR = Path(__file__).resolve().parent
-FRONTEND_DIR = BASE_DIR / "frontend"
-TEMPLATES_DIR = FRONTEND_DIR / "templates"
-STATIC_DIR = FRONTEND_DIR / "static"
-
-# Ensure directories exist
-os.makedirs(str(STATIC_DIR), exist_ok=True)
-os.makedirs(str(TEMPLATES_DIR), exist_ok=True)
-
-# Mount static files directory
-try:
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-    logger.info("Successfully mounted static directory")
-except Exception as e:
-    logger.error(f"Failed to mount static directory: {str(e)}")
+# Mount the static folder
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
 # CORS middleware
 origins = [
@@ -65,86 +42,61 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define service information
-SERVICES = {
-    "menu": {
-        "name": "Menu Service",
-        "base_url": "http://localhost:8000",
-        "routes": {
-            "customer_menu": "/customer-menu",
-            "kitchen": "/kitchen",
-            "management": "/"  # Menu management page
-        }
-    },
-    "order": {
-        "name": "Order Service",
-        "base_url": "http://localhost:8002",
-        "routes": {
-            "customer_order": "/",
-            "kitchen_order": "/kitchen"
-        }
-    },
-    "table": {
-        "name": "Table & Bill Service",
-        "base_url": "http://localhost:8003",
-        "routes": {
-            "manage_tables": "/",
-            "bills": "/bills"
-        }
-    }
-}
+session_tokens = {}
 
-# Homepage route
-@app.get("/")
-async def serve_index(request: Request):
-    """Serve the gateway homepage with links to all services."""
-    try:
-        file_path = str(TEMPLATES_DIR / "index.html")
-        if not os.path.exists(file_path):
-            logger.error("index.html template not found")
-            # If the template doesn't exist yet, return a temporary response
-            return {"message": "Gateway service is running, but the index template is not yet created"}
-            
-        return FileResponse(file_path)
-    except Exception as e:
-        logger.error(f"Error serving index template: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error serving page: {str(e)}")
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="your-super-secret-key"
+)
+
+def authMiddleware(request: Request):
+    user = request.session.get("user")
+    token = request.session.get("token")
+    if user == None or token not in session_tokens:
+        raise HTTPException(
+            status_code=HTTP_302_FOUND,
+            headers={"Location": "/login?error=You+have+to+login+to+access+this+page"},
+        )
     
-@app.get("/dashboard", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse("index_dashboard.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/login", response_class=HTMLResponse)
+async def login(request: Request, error: str = None):
+    return templates.TemplateResponse("login.html", {"request": request, "error": error})
+
+@app.post("/login")
+async def login(request: Request, username: str = Form(...), password: str = Form(...)):
+    if username == "manager" and password == "123456":
+        token = str(uuid.uuid4())
+        request.session["user"] = "manager"
+        request.session["token"] = token
+        session_tokens[token] = "manager"
+        return RedirectResponse("/manager", status_code=HTTP_302_FOUND)
+    return RedirectResponse("/login?error=Invalid+credentials", status_code=HTTP_302_FOUND)
+
+@app.get("/logout")
+async def logout(request: Request):
+    token = request.session.get("token")
+    if token in session_tokens:
+        del session_tokens[token]
+    request.session.clear()
+    return RedirectResponse("/login", status_code=HTTP_302_FOUND)
 
 @app.get("/manager", response_class=HTMLResponse)
-async def manager_page(request: Request):
+async def managerPage(request: Request, _auth=Depends(authMiddleware)):
     return templates.TemplateResponse("manager-dashboard.html", {"request": request})
 
 @app.get("/kitchen", response_class=HTMLResponse)
-async def kitchen_page(request: Request):
+async def kitchenPage(request: Request):
     return templates.TemplateResponse("kitchen-staff-dashboard.html", {"request": request})
 
 @app.get("/service", response_class=HTMLResponse)
-async def service_page(request: Request):
+async def servicePage(request: Request):
     return templates.TemplateResponse("service-staff-dashboard.html", {"request": request})
 
-# Redirect routes for each service
-@app.get("/service/{service_name}/{route_name}")
-async def redirect_to_service(service_name: str, route_name: str):
-    """Redirect to the specified service and route."""
-    if service_name not in SERVICES:
-        raise HTTPException(status_code=404, detail=f"Service '{service_name}' not found")
-    
-    service = SERVICES[service_name]
-    if route_name not in service["routes"]:
-        raise HTTPException(status_code=404, detail=f"Route '{route_name}' not found in service '{service_name}'")
-    
-    target_url = service["base_url"] + service["routes"][route_name]
-    return RedirectResponse(url=target_url)
-
-# Health check endpoint
-@app.get("/health")
-async def health_check():
-    return {"status": "ok", "service": "gateway-service"}
 
 # Run the app
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)  # Using port 8001 for the gateway
+    uvicorn.run(app, host="0.0.0.0", port=8001)
