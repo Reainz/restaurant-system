@@ -35,10 +35,24 @@ app = FastAPI(
     version="1.0.0",
 )
 
+origins = [
+    "http://localhost",
+    "http://localhost:8000",  # Menu service
+    "http://localhost:8001",  # Gateway service
+    "http://localhost:8002",  # Order service
+    "http://localhost:8003",  # Table & Bill service
+    "http://127.0.0.1",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8001",
+    "http://127.0.0.1:8002",
+    "http://127.0.0.1:8003",
+]
+
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For development only - restrict in production
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

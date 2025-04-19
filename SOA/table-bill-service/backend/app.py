@@ -2,17 +2,17 @@ from fastapi import FastAPI, Query, HTTPException, Path, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from fastapi.requests import Request
 import jinja2
 if not hasattr(jinja2, 'contextfunction'):
     jinja2.contextfunction = jinja2.pass_context
 from typing import List, Optional
-from datetime import datetime
 import logging
 from pathlib import Path
-import httpx
-import os
+from starlette.status import HTTP_302_FOUND
+import requests
+
 
 from .models import (
     BillUpdate, BillResponse, BillListResponse,
@@ -47,13 +47,16 @@ app.include_router(notification_router)
 origins = [
     "http://localhost",
     "http://localhost:8000",  # Menu service
+    "http://localhost:8001",  # Gateway service
     "http://localhost:8002",  # Order service
     "http://localhost:8003",  # Table & Bill service
     "http://127.0.0.1",
     "http://127.0.0.1:8000",
+    "http://127.0.0.1:8001",
     "http://127.0.0.1:8002",
     "http://127.0.0.1:8003",
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -104,6 +107,102 @@ async def health_check():
 
 # Table endpoints
 # (Table routes removed - now in routes.py)
+
+# async def auth_middleware(request: Request):
+#     """
+#     Middleware to verify authentication from gateway service
+#     Optional parameter 'require_role' to check for specific role
+#     """
+
+#     request.state.user = None
+
+#     token = request.cookies.get("auth_token")
+    
+#     if not token:
+#         return RedirectResponse(
+#             "http://localhost:8001/login?error=Authentication+required",
+#             status_code=HTTP_302_FOUND
+#         )
+    
+#     try:
+#         response = requests.get(
+#             "http://localhost:8001/api/verify-token",
+#             params={"token": token}
+#         )
+#         data = response.json()
+        
+#         if not data.get("valid"):
+#             return RedirectResponse(
+#                 "http://localhost:8001/login?error=Invalid+or+expired+session",
+#                 status_code=HTTP_302_FOUND
+#             )
+        
+#         request.state.user = data.get("user_info")
+
+#         if request.state.user is None:
+#             return RedirectResponse(
+#                 "http://localhost:8001/login?error=Invalid+or+expired+session",
+#                 status_code=HTTP_302_FOUND
+#             )
+        
+#         return True
+    
+#     except requests.RequestException:
+#         # Gateway service is unreachable
+#         return HTMLResponse(
+#             content="Authentication service unavailable. Please try again later.",
+#             status_code=503
+#         )
+
+
+async def auth_middleware(request: Request):
+    """
+    Middleware to verify authentication from gateway service
+    """
+    request.state.user = None
+    token = request.cookies.get("auth_token")
+    
+    if not token:
+        # Instead of returning a redirect response, raise an HTTPException
+        raise HTTPException(
+            status_code=HTTP_302_FOUND,
+            headers={"Location": "http://localhost:8001/login?error=Authentication+required"}
+        )
+    
+    try:
+        response = requests.get(
+            "http://localhost:8001/api/verify-token",
+            params={"token": token}
+        )
+        
+        # Add debugging to see what's coming back
+        logger.info(f"Token verification response: {response.status_code} - {response.text}")
+        
+        data = response.json()
+        
+        if not data.get("valid"):
+            raise HTTPException(
+                status_code=HTTP_302_FOUND,
+                headers={"Location": "http://localhost:8001/login?error=Invalid+or+expired+session"}
+            )
+        
+        user_info = data.get("user_info")
+        request.state.user = user_info
+        
+        if not user_info:
+            raise HTTPException(
+                status_code=HTTP_302_FOUND,
+                headers={"Location": "http://localhost:8001/login?error=Missing+user+information"}
+            )
+        
+        return user_info  # Return user info rather than True
+        
+    except requests.RequestException as e:
+        logger.error(f"Error verifying token: {str(e)}")
+        raise HTTPException(
+            status_code=503,
+            detail="Authentication service unavailable. Please try again later."
+        )
 
 # Bill endpoints
 @app.get("/api/bills", response_model=BillListResponse, tags=["bills"])
@@ -258,22 +357,6 @@ async def get_bill_receipt_html(bill_id: str):
         logger.error(f"Error generating HTML receipt for bill {bill_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Error generating bill receipt.")
 
-# Data Consistency Endpoints
-# @app.get("/api/bills/{bill_id}/verify", tags=["data-consistency"])
-# async def verify_bill_consistency(bill_id: str):
-#     """Verify bill data consistency with menu and order services."""
-#     return await DataConsistencyService.verify_bill_consistency(bill_id)
-
-# @app.post("/api/bills/{bill_id}/reconcile", tags=["data-consistency"])
-# async def reconcile_bill(bill_id: str, auto_fix: bool = False):
-#     """Reconcile bill data with menu and order services."""
-#     return await DataConsistencyService.reconcile_bill(bill_id, auto_fix)
-
-# @app.post("/api/bills/{bill_id}/refresh", tags=["data-consistency"])
-# async def force_refresh_bill(bill_id: str):
-#     """Force refresh bill data from menu and order services."""
-#     return await DataConsistencyService.force_refresh_from_services(bill_id)
-
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Global exception handler."""
@@ -284,41 +367,41 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 # Frontend routes (Now defined AFTER API routes)
-@app.get("/{path:path}", tags=["ui"], response_class=HTMLResponse)
-async def serve_template(request: Request, path: str = ""):
-    """Serve HTML templates based on the request path"""
-    # Sanitize path to prevent directory traversal
-    import os
-    safe_path = os.path.normpath(path).lstrip('/')
+# @app.get("/{path:path}", tags=["ui"], response_class=HTMLResponse)
+# async def serve_template(request: Request, path: str = ""):
+#     """Serve HTML templates based on the request path"""
+#     # Sanitize path to prevent directory traversal
+#     import os
+#     safe_path = os.path.normpath(path).lstrip('/')
     
-    logger.info(f"Serving template for path: '{safe_path}'")
+#     logger.info(f"Serving template for path: '{safe_path}'")
     
-    template_mapping = {
-        "": "index.html",
-        "tables": "service-tables.html",
-        "bills": "service-bills.html", 
-        "customer-bill": "customer-bill.html"
-    }
+#     template_mapping = {
+#         "": "index.html",
+#         "tables": "service-tables.html",
+#         "bills": "service-bills.html", 
+#         "customer-bill": "customer-bill.html"
+#     }
     
-    # Get the template name from the mapping or use index.html as default
-    template_name = template_mapping.get(safe_path, "index.html")
-    logger.debug(f"Mapped path '{safe_path}' to template: '{template_name}'")
+#     # Get the template name from the mapping or use index.html as default
+#     template_name = template_mapping.get(safe_path, "index.html")
+#     logger.debug(f"Mapped path '{safe_path}' to template: '{template_name}'")
     
-    # Check if template exists
-    template_file = Path(templates.env.loader.searchpath[0]) / template_name
-    if not template_file.is_file():
-        logger.warning(f"Template not found: {template_name} for path {safe_path}")
-        # Optionally return a 404 template or raise HTTPException
-        # For simplicity, falling back to index.html as per original logic
-        template_name = "index.html"
+#     # Check if template exists
+#     template_file = Path(templates.env.loader.searchpath[0]) / template_name
+#     if not template_file.is_file():
+#         logger.warning(f"Template not found: {template_name} for path {safe_path}")
+#         # Optionally return a 404 template or raise HTTPException
+#         # For simplicity, falling back to index.html as per original logic
+#         template_name = "index.html"
     
-    # Return the rendered template
-    try:
-        return templates.TemplateResponse(template_name, {"request": request})
-    except Exception as e:
-        logger.error(f"Error rendering template {template_name}: {str(e)}")
-        # Fallback or raise internal server error
-        raise HTTPException(status_code=500, detail="Error rendering page")
+#     # Return the rendered template
+#     try:
+#         return templates.TemplateResponse(template_name, {"request": request})
+#     except Exception as e:
+#         logger.error(f"Error rendering template {template_name}: {str(e)}")
+#         # Fallback or raise internal server error
+#         raise HTTPException(status_code=500, detail="Error rendering page")
 
 # Example frontend routes (ensure these match your needs)
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
@@ -330,8 +413,8 @@ async def tables_page(request: Request):
     return templates.TemplateResponse("service-tables.html", {"request": request})
 
 @app.get("/bills", response_class=HTMLResponse, include_in_schema=False)
-async def bills_page(request: Request):
-    return templates.TemplateResponse("service-bills.html", {"request": request})
+async def bills_page(request: Request, _=Depends(auth_middleware)):
+    return templates.TemplateResponse("service-bills.html", {"request": request, "username": request.state.user})
 
 @app.get("/customer-bill", response_class=HTMLResponse, include_in_schema=False)
 async def customer_bill_page(request: Request, bill_id: str = Query(...)):

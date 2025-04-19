@@ -2,7 +2,7 @@ import uvicorn
 import uuid
 from fastapi import FastAPI, Depends, HTTPException, Form
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.requests import Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -46,7 +46,7 @@ session_tokens = {}
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key="your-super-secret-key"
+    secret_key="super-secret-key-he-he"
 )
 
 def authMiddleware(request: Request):
@@ -57,6 +57,13 @@ def authMiddleware(request: Request):
             status_code=HTTP_302_FOUND,
             headers={"Location": "/login?error=You+have+to+login+to+access+this+page"},
         )
+    
+@app.get("/api/verify-token")
+async def verify_token(token: str):
+    """API endpoint for other services to verify tokens"""
+    if token in session_tokens:
+        return {"valid": True, "user_info": session_tokens[token]}
+    return {"valid": False}
     
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -82,7 +89,13 @@ async def logout(request: Request):
     if token in session_tokens:
         del session_tokens[token]
     request.session.clear()
-    return RedirectResponse("/login", status_code=HTTP_302_FOUND)
+
+    # Also clear any auth cookies we've set
+    response = RedirectResponse("/login", status_code=HTTP_302_FOUND)
+    response.delete_cookie(key="auth_token")
+    response.delete_cookie(key="auth_user")
+    
+    return response
 
 @app.get("/manager", response_class=HTMLResponse)
 async def managerPage(request: Request, _auth=Depends(authMiddleware)):
@@ -95,6 +108,51 @@ async def kitchenPage(request: Request):
 @app.get("/service", response_class=HTMLResponse)
 async def servicePage(request: Request):
     return templates.TemplateResponse("service-staff-dashboard.html", {"request": request})
+
+
+# Redirect to other services with authentication via cookies
+@app.get("/redirect/{service}/{path:path}")
+async def redirect_service(service: str, path: str, request: Request, auth=Depends(authMiddleware)):
+    services = {
+        "menu": "http://localhost:8000",
+        "order": "http://localhost:8002",
+        "table": "http://localhost:8003"
+    }
+    
+    if service not in services:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    service_url = f"{services[service]}/{path}"
+    
+    # Get token and user info
+    token = request.session.get("token")
+    user = request.session.get("user")
+    
+    # Set secure cookies and redirect
+    response = RedirectResponse(service_url, status_code=HTTP_302_FOUND)
+    
+    # Set HTTP-only cookies that will be sent to the other service
+    response.set_cookie(
+        key="auth_token",
+        value=token,
+        httponly=True,      # Cannot be accessed by JavaScript
+        # secure=True,      # Uncomment in production with HTTPS
+        samesite="lax",     # Allows redirects while preventing CSRF
+        max_age=3600        # 1 hour expiration
+    )
+    
+    # These cookies are also HTTP-only but contain user info for the service
+    response.set_cookie(
+        key="auth_user",
+        value=user,
+        httponly=True,
+        # secure=True,
+        samesite="lax",
+        max_age=3600
+    )
+    
+    return response
+
 
 
 # Run the app

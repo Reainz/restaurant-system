@@ -8,7 +8,7 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from bson import ObjectId
@@ -44,10 +44,12 @@ except Exception as e:
 origins = [
     "http://localhost",
     "http://localhost:8000",  # Menu service
+    "http://localhost:8001",  # Gateway service
     "http://localhost:8002",  # Order service
     "http://localhost:8003",  # Table & Bill service
     "http://127.0.0.1",
     "http://127.0.0.1:8000",
+    "http://127.0.0.1:8001",
     "http://127.0.0.1:8002",
     "http://127.0.0.1:8003",
 ]
@@ -127,34 +129,78 @@ async def health_check():
     return {"status": "ok", "service": "menu-service"}
 
 # Frontend routes
-@app.get("/")
-@app.get("/customer-menu")
-@app.get("/kitchen")
-async def serve_template(request: Request):
-    """Serve HTML template based on the request path."""
-    try:
-        # Map routes to template files
-        templates = {
-            "/": "index.html",
-            "/customer-menu": "customer-menu.html",
-            "/kitchen": "kitchen.html"
-        }
+# @app.get("/")
+# @app.get("/customer-menu")
+# @app.get("/kitchen")
+# async def serve_template(request: Request):
+#     """Serve HTML template based on the request path."""
+#     try:
+#         # Map routes to template files
+#         templates = {
+#             "/": "index.html",
+#             "/customer-menu": "customer-menu.html",
+#             "/kitchen": "kitchen.html"
+#         }
         
-        # Get the template filename based on the request path
-        template_file = templates.get(request.url.path)
-        if not template_file:
-            raise HTTPException(status_code=404, detail="Template not found")
+#         # Get the template filename based on the request path
+#         template_file = templates.get(request.url.path)
+#         if not template_file:
+#             raise HTTPException(status_code=404, detail="Template not found")
         
-        # Build the file path
-        file_path = str(TEMPLATES_DIR / template_file)
-        if not os.path.exists(file_path):
-            raise HTTPException(status_code=404, detail=f"{template_file} not found")
+#         # Build the file path
+#         file_path = str(TEMPLATES_DIR / template_file)
+#         if not os.path.exists(file_path):
+#             raise HTTPException(status_code=404, detail=f"{template_file} not found")
             
+#         return FileResponse(file_path)
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         logger.error(f"Error serving template {request.url.path}: {str(e)}")
+#         raise HTTPException(status_code=500, detail=f"Error serving page: {str(e)}")
+
+# Frontend routes - each with its own function for better organization
+
+@app.get("/", response_class=HTMLResponse)
+async def serve_index(request: Request):
+    """Serve the index/home page template."""
+    try:
+        file_path = str(TEMPLATES_DIR / "index.html")
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="index.html not found")
         return FileResponse(file_path)
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error serving template {request.url.path}: {str(e)}")
+        logger.error(f"Error serving index template: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error serving page: {str(e)}")
+
+@app.get("/customer-menu", response_class=HTMLResponse)
+async def serve_customer_menu(request: Request):
+    """Serve the customer menu template."""
+    try:
+        file_path = str(TEMPLATES_DIR / "customer-menu.html")
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="customer-menu.html not found")
+        return FileResponse(file_path)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error serving customer menu template: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error serving page: {str(e)}")
+
+@app.get("/kitchen", response_class=HTMLResponse)
+async def serve_kitchen(request: Request):
+    """Serve the kitchen page template."""
+    try:
+        file_path = str(TEMPLATES_DIR / "kitchen.html")
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="kitchen.html not found")
+        return FileResponse(file_path)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error serving kitchen template: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error serving page: {str(e)}")
 
 @app.put("/api/menu-items/{item_id}")
