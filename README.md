@@ -92,11 +92,11 @@ However, for the gateway-service, run this to run
 `python -m uvicorn app:app --reload --port 8001
 
 
-For example:
-- Service 1 (Gateway): --port 8001
-- Service 2: --port 8000
-- Service 3: --port 8002
-- Service 4: --port 8003
+Services and Ports:
+- gateway-service: --port 8001
+- menu-service: --port 8000
+- order-service: --port 8002
+- table-bill-service: --port 8003
 
 Make sure no ports conflict.
 
@@ -104,9 +104,9 @@ Make sure no ports conflict.
 
 🌐 Accessing the Web App
 - Main App (Gateway): http://localhost:8001/ (you can just go to this one, Sir. The other are connected to this ^^)
-- Service 1 Index Page: http://localhost:8000/
-- Service 2 Index Page: http://localhost:8002/
-- Service 3 Index Page: http://localhost:8003/
+- menu-service Index Page: http://localhost:8000/
+- order-service Index Page: http://localhost:8002/
+- table-bill-service Index Page: http://localhost:8003/
 
 You can explore each service directly by visiting the URLs.
 
