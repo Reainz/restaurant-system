@@ -1,4 +1,4 @@
-# 🍽️ Service-Oriented FastAPI Web App
+# Service-Oriented FastAPI Web App
 
 This is midterm project of service-oriented architecture course at TDTU, a microservice-based web application built with **FastAPI**. This web application has four independent services that communicate with each other and a **MongoDB** database. Each service runs as its own FastAPI app and serves a specific purpose.
 
@@ -48,31 +48,27 @@ source venv/bin/activate
 ```
 On windows
 
-```venv\Scripts\activate on Windows
-```
+`venv\Scripts\activate on Windows`
+
 
 ### 4. Install Required Dependencies
 
 Each service has a requirements.txt file. Run the following in each terminal tab,
 
-```pip install -r requirements.txt
-```
+`pip install -r requirements.txt`
 
 ### 5. Install MongoDB (If Not Already Installed)
 
 Make sure MongoDB Community Edition is installed on the machine. After that, since your laptop is mac, sir,
 
 To start mongodb, run this.
-```brew services start mongodb-community
-```
+`brew services start mongodb-community`
 
 To see if mongodb is running, run this.
-```brew services list
-```
+`brew services list`
 
 To stop the running mongodb, run this.
-```brew services stop mongodb-community
-```
+`brew services stop mongodb-community`
 
 For Windows, go to official website of it and dowload it. Then, Start the mongodb.
 
@@ -80,45 +76,44 @@ For Windows, go to official website of it and dowload it. Then, Start the mongod
 
 Run the provided MongoDB setup script (already provided):
 
-```mongo < setup_script.js
-```
+`mongo < setup_script.js`
 
 
 ### 7. Run Each FastAPI Service
 
 In each terminal tab (each inside a separate service folder), run:
 
-```python -m uvicorn backend.app:app --reload --port <PORT>
-```
+`python -m uvicorn backend.app:app --reload --port <PORT>`
+
 Like
-```python -m uvicorn backend.app:app --reload --port 8000
-```
+`python -m uvicorn backend.app:app --reload --port 8000`
+
 However, for the gateway-service, run this to run
-```python -m uvicorn app:app --reload --port 8001
-```
+`python -m uvicorn app:app --reload --port 8001
+
 
 For example:
-	•	Service 1 (Gateway): --port 8001
-	•	Service 2: --port 8000
-	•	Service 3: --port 8002
-	•	Service 4: --port 8003
+- Service 1 (Gateway): --port 8001
+- Service 2: --port 8000
+- Service 3: --port 8002
+- Service 4: --port 8003
 
 Make sure no ports conflict.
 
 ---
 
 🌐 Accessing the Web App
-	•	Main App (Gateway): http://localhost:8001/ (you can just go to this one, Sir. The other are connected to this ^^)
-	•	Service 1 Index Page: http://localhost:8000/
-	•	Service 2 Index Page: http://localhost:8002/
-	•	Service 3 Index Page: http://localhost:8003/
+- Main App (Gateway): http://localhost:8001/ (you can just go to this one, Sir. The other are connected to this ^^)
+- Service 1 Index Page: http://localhost:8000/
+- Service 2 Index Page: http://localhost:8002/
+- Service 3 Index Page: http://localhost:8003/
 
 You can explore each service directly by visiting the URLs.
 
 ---
 
 **Notes**
-	•	All services must be running for full functionality.
-	•	MongoDB must be running before starting the services.
-	•	If any service fails to start, check that the correct port is used and dependencies are installed.
+- All services must be running for full functionality.
+- MongoDB must be running before starting the services.
+- If any service fails to start, check that the correct port is used and dependencies are installed.
 
