@@ -1,0 +1,294 @@
+:root {
+    --primary-bg: #ffffff;
+    --secondary-bg: #E0E4EE;
+    --text-color: #353755;
+    --hover-color: #E0E4EE;
+    --shadow-light: 0 2px 5px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-hover: 0 6px 12px rgba(0,0,0,0.15);
+    
+    --button-admin: #FFD8CC;
+    --button-kitchen: #D0E2FF;
+    --button-service: #D0FFDD;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.header {
+    background-color: var(--primary-bg);
+    padding: 15px 0;
+    box-shadow: var(--shadow-light);
+}
+
+.nav-link {
+    color: var(--text-color);
+    margin-right: 15px;
+    border-radius: 5px;
+    padding: 8px 15px;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background-color: var(--hover-color);
+}
+
+.nav-link.home {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+
+.footer {
+    background-color: var(--secondary-bg);
+    padding: 50px 0 130px;
+    color: var(--text-color);
+    margin-top: auto;
+}
+
+.footer-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.footer-description {
+    margin-bottom: 80px;
+}
+
+.team-members {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.member {
+    width: 33%;
+}
+
+.university {
+    font-size: 0.85rem;
+}
+
+.logo-footer {
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.course-name {
+    text-align: right;
+    font-size: 0.85rem;
+}
+
+.welcome-section {
+    min-height: 300px;
+    padding: 40px 0;
+}
+
+.welcome-heading {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    line-height: 1.2;
+}
+
+.welcome-subtext {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.welcome-image {
+    max-height: 300px;
+    object-fit: contain;
+}
+
+.continue-section {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.continue-heading {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+
+.role-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.role-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 100%;
+    max-width: 250px;
+    padding: 20px;
+    border-radius: 8px;
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-medium);
+}
+
+.role-button:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-admin {
+    background-color: var(--button-admin);
+}
+
+.btn-kitchen {
+    background-color: var(--button-kitchen);
+}
+
+.btn-service {
+    background-color: var(--button-service);
+}
+
+.instructions-section {
+    padding: 40px 0;
+    background-color: var(--primary-bg);
+}
+
+.instruction-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-light);
+}
+
+.instruction-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .role-button {
+        max-width: 100%;
+    }
+    
+    .team-members {
+        flex-direction: column;
+    }
+    
+    .member {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .welcome-heading {
+        font-size: 2rem;
+    }
+    
+    .logo-footer, .course-name {
+        text-align: center;
+        margin-top: 20px;
+    }
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-md-3, .col-md-4, .col-md-5, .col-md-7, .col-md-8 {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+@media (min-width: 768px) {
+    .col-md-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+    
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+    
+    .col-md-5 {
+        flex: 0 0 41.666667%;
+        max-width: 41.666667%;
+    }
+    
+    .col-md-7 {
+        flex: 0 0 58.333333%;
+        max-width: 58.333333%;
+    }
+    
+    .col-md-8 {
+        flex: 0 0 66.666667%;
+        max-width: 66.666667%;
+    }
+}
+
+.align-items-center {
+    align-items: center !important;
+}
+
+.justify-content-center {
+    justify-content: center !important;
+}
+
+.text-end {
+    text-align: right !important;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}

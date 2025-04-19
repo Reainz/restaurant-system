@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Management System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .service-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+        .service-card h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .service-buttons {
+            margin-top: 20px;
+        }
+        .btn {
+            display: block;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px 0;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Restaurant Management System</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="services">
+            <!-- Menu Service Card -->
+            <div class="service-card">
+                <h2>Menu Management</h2>
+                <p>Create, update, and manage your restaurant's menu items.</p>
+                <div class="service-buttons">
+                    <a href="/service/menu/management" class="btn">Menu Management</a>
+                    <a href="/service/menu/customer_menu" class="btn">Customer Menu View</a>
+                    <a href="/service/menu/kitchen" class="btn">Kitchen Menu View</a>
+                </div>
+            </div>
+
+            <!-- Order Service Card -->
+            <div class="service-card">
+                <h2>Order Management</h2>
+                <p>Manage customer orders and kitchen preparation.</p>
+                <div class="service-buttons">
+                    <a href="/service/order/customer_order" class="btn">Customer Order</a>
+                    <a href="/service/order/kitchen_order" class="btn">Kitchen Order View</a>
+                </div>
+            </div>
+
+            <!-- Table & Bill Service Card -->
+            <div class="service-card">
+                <h2>Table & Bill Management</h2>
+                <p>Manage tables, reservations, and customer bills.</p>
+                <div class="service-buttons">
+                    <a href="/service/table/manage_tables" class="btn">Table Management</a>
+                    <a href="/service/table/bills" class="btn">Bills & Payments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Restaurant Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
