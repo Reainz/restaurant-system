@@ -113,6 +113,11 @@ function createTableElement(table) {
             <h3 class="font-bold text-lg text-gray-800">Table ${table.table_number}</h3>
             <span class="table-status ${statusBadgeClasses} px-2 py-0.5 rounded-full text-xs font-medium capitalize">${table.status}</span>
         </div>
+
+        <div class="table-image-container flex justify-center my-3">
+            <img class="table-image w-24 h-24 object-contain" src="${table.status === 'available' ? '/static/images/table_on.png' : '/static/images/table_off.png'}" alt="${table.status === 'available' ? 'Available Table' : 'Occupied Table'}">
+        </div>
+
         <div class="text-sm text-gray-600 space-y-1 mb-3 flex-grow">
             <div class="flex items-center space-x-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500">
@@ -284,6 +289,12 @@ function updateTableElement(tableElement, table) {
     const newCardContent = createTableElement(table); 
     tempDiv.innerHTML = newCardContent.innerHTML;
     
+    const tableImage = tableElement.querySelector('.table-image');
+    if (tableImage) {
+        tableImage.src = table.status === 'available' ? '/static/images/table_on.png' : '/static/images/table_off.png';
+        tableImage.alt = table.status === 'available' ? 'Available Table' : 'Occupied Table';
+    }
+
     // Replace relevant sections reliably
     const currentHeader = tableElement.querySelector('.flex.justify-between.items-center');
     const newHeader = tempDiv.querySelector('.flex.justify-between.items-center');

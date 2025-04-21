@@ -77,93 +77,7 @@ class BillService:
             logger.error(f"Error fetching bills from database: {str(e)}")
             return [] # Return empty list on error
     
-    # @staticmethod
-    # async def create_bill(bill_data: BillCreate) -> BillResponse:
-    #     """
-    #     Create a new bill.
-        
-    #     Args:
-    #         bill_data: The bill data to create
-            
-    #     Returns:
-    #         BillResponse: The created bill
-    #     """
-    #     logger.info(f"Creating bill for order_id: {bill_data.order_id}, table_id: {bill_data.table_id}")
-        
-    #     try:
-    #         # Validate and enhance bill data using external services
-    #         updated_items, calculated_total = await ServiceIntegration.validate_bill_data(bill_data)
-            
-    #         collection = await get_bills_collection()
-            
-    #         # Generate a unique bill ID
-    #         bill_id = str(uuid.uuid4())
-            
-    #         # Create the bill object
-    #         current_time = datetime.now()
-    #         new_bill = {
-    #             "bill_id": bill_id,
-    #             "order_id": bill_data.order_id,
-    #             "table_id": bill_data.table_id,
-    #             "status": "open",
-    #             "payment_status": "pending",
-    #             "total_amount": calculated_total,
-    #             "items": updated_items,
-    #             "created_at": current_time,
-    #             "updated_at": current_time
-    #         }
-            
-    #         # Insert the bill into the database
-    #         await collection.insert_one(new_bill)
-            
-    #         # Get the inserted bill
-    #         created_bill = await collection.find_one({"bill_id": bill_id})
-            
-    #         if not created_bill:
-    #             raise HTTPException(status_code=500, detail="Bill created but not found in database")
-            
-    #         # Try to update the table status if we have a table_id
-    #         if bill_data.table_id:
-    #             try:
-    #                 await TableService.update_table_status(bill_data.table_id, "occupied")
-    #                 logger.info(f"Updated table {bill_data.table_id} status to occupied")
-    #             except Exception as e:
-    #                 logger.warning(f"Failed to update table status: {str(e)}")
-            
-    #         # Send webhook notification for bill creation
-    #         await WebhookNotificationService.send_notification(
-    #             service="bill",
-    #             event_type="created",
-    #             data={"bill_id": bill_id, "table_id": bill_data.table_id, "order_id": bill_data.order_id}
-    #         )
-            
-    #         # Add verification info
-    #         try:
-    #             from .data_consistency import DataConsistencyService
-    #             verification_result = await DataConsistencyService.verify_bill_consistency(bill_id)
-    #             if not verification_result.get("verified", False):
-    #                 issues = verification_result.get("issues", [])
-    #                 if issues:
-    #                     logger.warning(f"Consistency issues with new bill {bill_id}: {', '.join(issues)}")
-    #         except Exception as e:
-    #             logger.error(f"Error verifying new bill consistency: {str(e)}")
-            
-    #         return BillResponse(**{k: v for k, v in created_bill.items() if k != '_id'})
-    #     except HTTPException as e:
-    #         # Re-raise HTTP exceptions
-    #         raise
-    #     except DuplicateKeyError:
-    #         logger.error(f"Duplicate key error while creating bill for order: {bill_data.order_id}")
-    #         raise HTTPException(
-    #             status_code=400,
-    #             detail=f"Bill for order {bill_data.order_id} already exists"
-    #         )
-    #     except PyMongoError as e:
-    #         logger.error(f"Database error while creating bill: {str(e)}")
-    #         raise HTTPException(status_code=500, detail="Database error while creating bill")
-    #     except Exception as e:
-    #         logger.error(f"Unexpected error creating bill: {str(e)}")
-    #         raise HTTPException(status_code=500, detail=f"Error creating bill: {str(e)}")
+    
     
     @staticmethod
     async def create_bill_from_order(order_id: str) -> BillResponse:
@@ -244,11 +158,7 @@ class BillService:
             logger.error(f"Error processing items/prices for order {order_id}: {str(e)}")
             raise HTTPException(status_code=500, detail="Error calculating bill total.")
 
-        # --- REMOVE Tax Calculation --- 
-        # tax_rate = 0.07
-        # final_total_amount = total_amount * (1 + tax_rate)
-        # --- End Removal ---
-        # The total_amount calculated from items IS the final total now
+        
         final_total_amount = total_amount
 
         # 5. Create and insert the new bill
@@ -385,82 +295,7 @@ class BillService:
             logger.error(f"Database error while updating bill {bill_id}: {str(e)}")
             raise HTTPException(status_code=500, detail="Database error while updating bill")
     
-    # @staticmethod
-    # async def update_bill_status(bill_id: str, status: str) -> BillResponse:
-    #     """
-    #     Update the status of a specific bill.
-    #     If status is set to 'closed' or 'paid', check if the table should become available.
-    #     """
-    #     logger.info(f"Updating status for bill {bill_id} to {status}")
-    #     collection = await get_bills_collection()
-        
-    #     # Fetch the bill first to get table_id and check current status
-    #     bill = await collection.find_one({"bill_id": bill_id})
-    #     if not bill:
-    #         logger.error(f"Bill {bill_id} not found for status update.")
-    #         raise HTTPException(status_code=404, detail=f"Bill {bill_id} not found")
-            
-    #     # Prevent invalid transitions (optional, but good practice)
-    #     # e.g., cannot reopen a closed/paid bill directly via this method?
-    #     # current_status = bill.get("status")
-    #     # if current_status in ['closed', 'paid'] and status not in ['closed', 'paid']:
-    #     #     raise HTTPException(status_code=400, detail=f"Cannot change status from {current_status} to {status}")
-            
-    #     update_data = {
-    #         "$set": {
-    #             "status": status,
-    #             "updated_at": datetime.now()
-    #         }
-    #     }
-        
-    #     # If setting to closed/paid, also update payment status if appropriate
-    #     if status in ['closed', 'paid'] and bill.get("payment_status") != 'paid':
-    #          logger.info(f"Setting payment_status to 'paid' as bill status is {status}")
-    #          update_data["$set"]["payment_status"] = 'paid' 
-        
-    #     result = await collection.update_one({"bill_id": bill_id}, update_data)
-        
-    #     if result.matched_count == 0:
-    #         # Should not happen due to check above, but safeguard
-    #         logger.error(f"Bill {bill_id} not found during update operation.")
-    #         raise HTTPException(status_code=404, detail=f"Bill {bill_id} not found during update")
-            
-    #     updated_bill_doc = await collection.find_one({"bill_id": bill_id})
-    #     if not updated_bill_doc:
-    #          raise HTTPException(status_code=500, detail="Failed to retrieve updated bill details")
-        
-    #     # --- START: Logic to update table status --- 
-    #     if status in ["closed", "paid"]:
-    #         table_id = bill.get("table_id")
-    #         if table_id:
-    #             logger.info(f"Bill {bill_id} marked as {status}. Checking if table {table_id} should become available.")
-    #             try:
-    #                 # Count other ACTIVE bills for the same table
-    #                 active_bill_count = await collection.count_documents({
-    #                     "table_id": table_id, 
-    #                     "bill_id": {"$ne": bill_id}, # Exclude the current bill
-    #                     "status": {"$in": ACTIVE_BILL_STATUSES} # Check against defined active statuses
-    #                 })
-                    
-    #                 logger.info(f"Found {active_bill_count} other active bill(s) for table {table_id}.")
-                    
-    #                 if active_bill_count == 0:
-    #                     logger.info(f"No other active bills found. Setting table {table_id} to available.")
-    #                     # Use TableService to update the table status
-    #                     await TableService.update_table_status(table_id, 'available')
-    #                 else:
-    #                      logger.info(f"Table {table_id} still has other active bills. Status not changed.")
-                         
-    #             except HTTPException as he:
-    #                 # Log error if table update fails but don't fail the bill update
-    #                 logger.error(f"HTTP Error trying to update table {table_id} status after closing bill {bill_id}: {he.detail}")
-    #             except Exception as e:
-    #                 logger.error(f"Error checking/updating table status for table {table_id} after closing bill {bill_id}: {str(e)}")
-    #         else:
-    #              logger.warning(f"Bill {bill_id} has no table_id associated. Cannot check table status.")
-    #     # --- END: Logic to update table status --- 
-        
-    #     return BillResponse(**{k: v for k, v in updated_bill_doc.items() if k != '_id'})
+
     
     @staticmethod
     async def update_payment_status(bill_id: str, payment_status: str) -> BillResponse:
