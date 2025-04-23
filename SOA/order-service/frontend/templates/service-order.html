@@ -5,15 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service Staff - Order Management</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <style>
         body {
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
+        .padding-20 {
+            padding: 20px;
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
-    <!-- Top navigation -->
-    <nav class="bg-gray-800 text-white p-8">
+<body>
+    <header class="header bg-white" id="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-8 d-flex align-items-center">
+                    <a class="nav-link home me-4" href="http://localhost:8001/">Home</a>
+                    <a class="nav-link me-4" href="#footer">About</a>
+                    <a class="nav-link" href="https://github.com/Reainz/restaurant-system" target="_blank" rel="noopener noreferrer">GitHub</a>
+                </div>
+                <div class="col-4 text-end">
+                    <a href="#" class="logo">Manwah</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="bg-gray-50 min-h-screen flex flex-col padding-20">
+        <!-- Top navigation -->
+    <!-- <nav class="bg-gray-800 text-white p-8">
         <div class="max-w-7xl mx-auto px-8">
             <div class="flex justify-between items-center">
                 <h1 class="text-3xl font-bold">Manwah Restaurant</h1>
@@ -22,7 +46,7 @@
                 </div>
             </div>
         </div>
-    </nav>
+    </nav> -->
 
     <!-- Main content -->
     <div class="container mx-auto px-4 py-8 flex-grow flex items-start justify-center mt-8">
@@ -209,6 +233,8 @@
                  </div> 
             </div>
         </div>
+    
+    
     </div>
 
     <!-- Create/Edit Order Modal -->
@@ -278,107 +304,40 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+
+    </div>
+    
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="footer-title">Our Midterm Explanation</div>
+                    <div class="footer-description">
+                        This web applicatoin is a restaurant management system that allows users, like manager, kitchen-staff, and service-staff, to manage their restaurant operations efficiently. It includes features for managing orders, bills, and customer interactions.
+                        The system is designed to be user-friendly and provides multiple views for different roles within the restaurant. The goal is to streamline the restaurant management process and enhance user experience.
+                    </div>
+                    <div class="team-members">
+                        <div class="member">Phong Hoang</div>
+                        <div class="member">Myat Thiri Maung</div>
+                        <div class="member">Thu Reain Htet Aung</div>
+                    </div>
+                    <div class="university">Ton Duc Thang University</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="logo-footer">Manwah</div>
+                    <div class="course-name">Service-oriented Architecture Course</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
     <script src="{{ (url_for('static', path='/js/config.js') ~ '?v=3') if request else '../js/config.js?v=3' }}"></script>
     <script src="{{ (url_for('static', path='/js/api-config.js') ~ '?v=3') if request else '../js/api-config.js?v=3' }}"></script>
     <!-- Load the main module entry point instead of the old script -->
     <script type="module" src="{{ (url_for('static', path='/js/modules/service-order/index.js') ~ '?v=4') if request else '../js/modules/service-order/index.js?v=4' }}"></script>
     
-    <!-- Fallback for browsers that don't support ES modules - COMMENTING OUT FOR NOW -->
-    <!-- 
-    <script nomodule>
-        console.log('ES modules not supported. Using fallback initialization.');
-        // Initialize page without modules
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fetch all orders
-            fetch('/api/orders')
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Loaded orders:', data);
-                    
-                    // Update order counts
-                    if (data.orders) {
-                        // Use CORRECTED IDs here if enabling fallback later
-                        document.getElementById('totalOrders').textContent = data.orders.length;
-                        
-                        const pendingOrders = data.orders.filter(order => 
-                            order.status !== 'completed' && 
-                            order.status !== 'cancelled'
-                        );
-                        document.getElementById('pendingOrders').textContent = pendingOrders.length;
-                        
-                        // Calculate total revenue from completed orders
-                        let totalRevenue = 0;
-                        data.orders.forEach(order => {
-                            if (order.status === 'completed') {
-                                order.items.forEach(item => {
-                                    totalRevenue += (item.price || 0) * item.quantity;
-                                });
-                            }
-                        });
-                        // Use CORRECTED ID
-                        document.getElementById('totalRevenue').textContent = `₫${totalRevenue.toLocaleString()}`;
-                        
-                        // Calculate average order value
-                        const avgOrderValue = data.orders.length > 0 ? totalRevenue / data.orders.length : 0;
-                        // Use CORRECTED ID
-                        document.getElementById('avgOrderValue').textContent = `₫${avgOrderValue.toLocaleString()}`;
-                        
-                        // Display orders in the table
-                        const ordersTableBody = document.getElementById('ordersList'); // Use CORRECTED ID
-                        if (ordersTableBody && data.orders.length > 0) {
-                            ordersTableBody.innerHTML = '';
-                            
-                            data.orders.forEach(order => {
-                                const row = document.createElement('tr');
-                                row.className = 'hover:bg-gray-100';
-                                
-                                const statusClass = getStatusClass(order.status);
-                                const formattedDate = new Date(order.created_at).toLocaleString();
-                                
-                                let totalItems = 0;
-                                let orderTotal = 0;
-                                if (order.items) {
-                                    totalItems = order.items.length;
-                                    orderTotal = order.items.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
-                                }
-                                
-                                row.innerHTML = `
-                                    <td class="px-4 py-3">${order.order_id.substring(0,8)}</td>
-                                    <td class="px-4 py-3">${order.table_id}</td>
-                                    <td class="px-4 py-3">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass}">
-                                            ${capitalizeFirstLetter(order.status)}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3">${formattedDate}</td>
-                                    <td class="px-4 py-3">${totalItems} items, ₫${orderTotal.toLocaleString()}</td>
-                                    <td class="px-4 py-3">
-                                        <button data-order-id="${order.order_id}" class="view-order-btn text-blue-600 hover:text-blue-800">
-                                            View
-                                        </button>
-                                    </td>
-                                `;
-                                
-                                ordersTableBody.appendChild(row);
-                            });
-                        } else if (ordersTableBody) {
-                            ordersTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">No orders found</td></tr>';
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching orders:', error);
-                    const ordersTableBody = document.getElementById('ordersList'); // Use CORRECTED ID
-                     if(ordersTableBody) ordersTableBody.innerHTML = 
-                        '<tr><td colspan="6" class="text-center py-4 text-red-500">Error loading orders</td></tr>';
-                });
-                
-            // Helper functions from old script would need to be included here too...
-             function getStatusClass(status) { ... } 
-             function capitalizeFirstLetter(string) { ... }
-        });
-    </script>
-    -->
+
 </body>
 </html>

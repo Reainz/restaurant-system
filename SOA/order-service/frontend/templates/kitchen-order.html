@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitchen Order Management</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <style>
         body {
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -37,181 +42,225 @@
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Top navigation -->
-    <nav class="bg-gray-800 text-white p-8">
-        <div class="max-w-7xl mx-auto px-8">
-            <div class="flex justify-between items-center">
-                <h1 class="text-3xl font-bold">Manwah Restaurant</h1>
-                <div class="space-x-8">
-                    <a href="/" class="text-xl hover:text-gray-300">Home</a>
+<body>
+    <header class="header bg-white" id="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-8 d-flex align-items-center">
+                    <a class="nav-link home me-4" href="http://localhost:8001/">Home</a>
+                    <a class="nav-link me-4" href="#footer">About</a>
+                    <a class="nav-link" href="https://github.com/Reainz/restaurant-system" target="_blank" rel="noopener noreferrer">GitHub</a>
+                </div>
+                <div class="col-4 text-end">
+                    <a href="#" class="logo">Manwah</a>
                 </div>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <div class="max-w-7xl mx-auto px-4 py-4 main-content">
-        <!-- Order Queue Summary -->
-        <div class="bg-white rounded-lg shadow-md p-4 mb-4">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-2xl font-bold">Kitchen Dashboard</h1>
-                <div class="text-sm text-gray-600">
-                    Average Wait Time: <span id="avgWaitTime" class="font-semibold">0:00</span>
+    <div class="bg-gray-50">
+        <!-- Top navigation -->
+        <!-- <nav class="bg-gray-800 text-white p-8">
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-bold">Manwah Restaurant</h1>
+                    <div class="space-x-8">
+                        <a href="/" class="text-xl hover:text-gray-300">Home</a>
+                    </div>
+                </div>
+            </div>
+        </nav> -->
+
+        <div class="max-w-7xl mx-auto px-4 py-4 main-content">
+            <!-- Order Queue Summary -->
+            <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-2xl font-bold">Kitchen Dashboard</h1>
+                    <div class="text-sm text-gray-600">
+                        Average Wait Time: <span id="avgWaitTime" class="font-semibold">0:00</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-5 gap-2">
+                    <div class="bg-blue-50 p-3 rounded-lg">
+                        <h3 class="text-xs font-medium text-blue-700">New Orders</h3>
+                        <p id="newOrdersCount" class="text-xl font-bold text-blue-600">0</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded-lg">
+                        <h3 class="text-xs font-medium text-yellow-700">In Progress</h3>
+                        <p id="inProgressCount" class="text-xl font-bold text-yellow-600">0</p>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded-lg">
+                        <h3 class="text-xs font-medium text-green-700">Ready</h3>
+                        <p id="readyCount" class="text-xl font-bold text-green-600">0</p>
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded-lg">
+                        <h3 class="text-xs font-medium text-purple-700">Completed</h3>
+                        <p id="completedCount" class="text-xl font-bold text-purple-600">0</p>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg">
+                        <h3 class="text-xs font-medium text-red-700">Delayed</h3>
+                        <p id="delayedCount" class="text-xl font-bold text-red-600">0</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-5 gap-2">
-                <div class="bg-blue-50 p-3 rounded-lg">
-                    <h3 class="text-xs font-medium text-blue-700">New Orders</h3>
-                    <p id="newOrdersCount" class="text-xl font-bold text-blue-600">0</p>
+            <!-- Order Queue and Details Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Order Queue -->
+                <div class="md:col-span-1">
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="text-lg font-semibold">Order Queue</h2>
+                            <div class="flex space-x-2">
+                                <select id="statusFilter" class="p-1 text-sm border rounded text-xs">
+                                    <option value="active">Active Orders</option>
+                                    <option value="all">All Statuses</option>
+                                    <option value="received">Received</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="paused">Paused</option>
+                                    <option value="ready">Ready</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Active Orders Container -->
+                        <div id="orderQueueContainer" class="order-queue-container">
+                            <div id="pendingOrders" class="space-y-2 mb-4">
+                                <!-- Pending orders (received, in-progress) will be dynamically added here -->
+                                <p class="text-gray-500 text-center py-4">Loading pending orders...</p>
+                            </div>
+                            <div id="preparedOrders" class="space-y-2">
+                                <!-- Prepared orders (ready) will be dynamically added here -->
+                                <p class="text-gray-500 text-center py-4">Loading prepared orders...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Order History Container (hidden by default) -->
+                        <div id="orderHistory" class="space-y-2 order-queue-container hidden">
+                            <!-- Ready and completed orders will be displayed here -->
+                            <p class="text-gray-500 text-center py-4">No order history</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-yellow-50 p-3 rounded-lg">
-                    <h3 class="text-xs font-medium text-yellow-700">In Progress</h3>
-                    <p id="inProgressCount" class="text-xl font-bold text-yellow-600">0</p>
-                </div>
-                <div class="bg-green-50 p-3 rounded-lg">
-                    <h3 class="text-xs font-medium text-green-700">Ready</h3>
-                    <p id="readyCount" class="text-xl font-bold text-green-600">0</p>
-                </div>
-                <div class="bg-purple-50 p-3 rounded-lg">
-                    <h3 class="text-xs font-medium text-purple-700">Completed</h3>
-                    <p id="completedCount" class="text-xl font-bold text-purple-600">0</p>
-                </div>
-                <div class="bg-red-50 p-3 rounded-lg">
-                    <h3 class="text-xs font-medium text-red-700">Delayed</h3>
-                    <p id="delayedCount" class="text-xl font-bold text-red-600">0</p>
+
+                <!-- Order Details -->
+                <div class="md:col-span-2">
+                    <div id="orderDetailPanel" class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h2 class="text-lg font-semibold">Order Details</h2>
+                            <div class="text-sm text-gray-600">
+                                Order Time: <span id="orderTime" class="font-semibold">--:--</span>
+                            </div>
+                        </div>
+
+                        <!-- Order Information -->
+                        <div class="grid grid-cols-3 gap-2 mb-3 text-sm">
+                            <div>
+                                <span class="text-gray-600">Order ID:</span>
+                                <span id="orderId" class="font-semibold ml-1">---</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Table Number:</span>
+                                <span id="tableNumber" class="font-semibold ml-1">--</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">Status:</span>
+                                <span id="orderStatus" class="font-semibold ml-1 px-2 py-0.5 rounded text-xs">---</span>
+                            </div>
+                        </div>
+
+                        <!-- Order Items -->
+                        <div class="mb-3">
+                            <h3 class="text-md font-medium mb-2">Order Items</h3>
+                            <div id="orderItems" class="space-y-2 max-h-[calc(100vh-460px)] overflow-y-auto">
+                                <!-- Order items will be dynamically added here -->
+                                <p class="text-gray-500">Select an order to view items</p>
+                            </div>
+                        </div>
+
+                        <!-- Special Instructions -->
+                        <div class="mb-3">
+                            <h3 class="text-md font-medium mb-1">Special Instructions</h3>
+                            <div id="specialInstructions" class="p-2 bg-gray-50 rounded-lg text-gray-700 text-sm">
+                                No special instructions
+                            </div>
+                        </div>
+
+                        <!-- Kitchen Notes -->
+                        <div class="mb-3">
+                            <h3 class="text-md font-medium mb-1">Kitchen Notes</h3>
+                            <textarea id="kitchenNotes" class="w-full p-2 border rounded-lg text-sm" rows="2" placeholder="Add preparation notes here..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons Container -->
+                    <div id="detailActionButtons" class="mt-4">
+                        <div class="grid grid-cols-4 gap-3">
+                            <button id="startAllBtn" class="bg-blue-400 text-white font-medium px-4 py-2 rounded hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                Start All Items
+                            </button>
+                            <button id="markReadyBtn" class="bg-green-500 text-white font-medium px-4 py-2 rounded hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                Mark Ready
+                            </button>
+                            <button id="pauseOrderBtn" class="bg-yellow-400 text-white font-medium px-4 py-2 rounded hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                Pause Order
+                            </button>
+                            <button id="cancelOrderBtn" class="bg-red-500 text-white font-medium px-4 py-2 rounded hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                Cancel Order
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Order Queue and Details Layout -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Order Queue -->
-            <div class="md:col-span-1">
-                <div class="bg-white rounded-lg shadow-md p-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-lg font-semibold">Order Queue</h2>
-                        <div class="flex space-x-2">
-                            <select id="statusFilter" class="p-1 text-sm border rounded text-xs">
-                                <option value="active">Active Orders</option>
-                                <option value="all">All Statuses</option>
-                                <option value="received">Received</option>
-                                <option value="in-progress">In Progress</option>
-                                <option value="paused">Paused</option>
-                                <option value="ready">Ready</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
+        <!-- Notifications -->
+        <div id="notification" class="fixed top-4 right-4 max-w-md transform transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md">
+                <div class="flex">
+                    <div class="py-1">
+                        <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
                     </div>
-                    
-                    <!-- Active Orders Container -->
-                    <div id="orderQueueContainer" class="order-queue-container">
-                        <div id="pendingOrders" class="space-y-2 mb-4">
-                            <!-- Pending orders (received, in-progress) will be dynamically added here -->
-                            <p class="text-gray-500 text-center py-4">Loading pending orders...</p>
-                        </div>
-                        <div id="preparedOrders" class="space-y-2">
-                            <!-- Prepared orders (ready) will be dynamically added here -->
-                             <p class="text-gray-500 text-center py-4">Loading prepared orders...</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Order History Container (hidden by default) -->
-                    <div id="orderHistory" class="space-y-2 order-queue-container hidden">
-                        <!-- Ready and completed orders will be displayed here -->
-                        <p class="text-gray-500 text-center py-4">No order history</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Order Details -->
-            <div class="md:col-span-2">
-                <div id="orderDetailPanel" class="bg-white rounded-lg shadow-md p-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-semibold">Order Details</h2>
-                        <div class="text-sm text-gray-600">
-                            Order Time: <span id="orderTime" class="font-semibold">--:--</span>
-                        </div>
-                    </div>
-
-                    <!-- Order Information -->
-                    <div class="grid grid-cols-3 gap-2 mb-3 text-sm">
-                        <div>
-                            <span class="text-gray-600">Order ID:</span>
-                            <span id="orderId" class="font-semibold ml-1">---</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600">Table Number:</span>
-                            <span id="tableNumber" class="font-semibold ml-1">--</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600">Status:</span>
-                            <span id="orderStatus" class="font-semibold ml-1 px-2 py-0.5 rounded text-xs">---</span>
-                        </div>
-                    </div>
-
-                    <!-- Order Items -->
-                    <div class="mb-3">
-                        <h3 class="text-md font-medium mb-2">Order Items</h3>
-                        <div id="orderItems" class="space-y-2 max-h-[calc(100vh-460px)] overflow-y-auto">
-                            <!-- Order items will be dynamically added here -->
-                            <p class="text-gray-500">Select an order to view items</p>
-                        </div>
-                    </div>
-
-                    <!-- Special Instructions -->
-                    <div class="mb-3">
-                        <h3 class="text-md font-medium mb-1">Special Instructions</h3>
-                        <div id="specialInstructions" class="p-2 bg-gray-50 rounded-lg text-gray-700 text-sm">
-                            No special instructions
-                        </div>
-                    </div>
-
-                    <!-- Kitchen Notes -->
-                    <div class="mb-3">
-                        <h3 class="text-md font-medium mb-1">Kitchen Notes</h3>
-                        <textarea id="kitchenNotes" class="w-full p-2 border rounded-lg text-sm" rows="2" placeholder="Add preparation notes here..."></textarea>
-                    </div>
-                </div>
-                
-                <!-- Action Buttons Container -->
-                <div id="detailActionButtons" class="mt-4">
-                     <div class="grid grid-cols-4 gap-3">
-                        <button id="startAllBtn" class="bg-blue-400 text-white font-medium px-4 py-2 rounded hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                            Start All Items
-                        </button>
-                        <button id="markReadyBtn" class="bg-green-500 text-white font-medium px-4 py-2 rounded hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                            Mark Ready
-                        </button>
-                        <button id="pauseOrderBtn" class="bg-yellow-400 text-white font-medium px-4 py-2 rounded hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                            Pause Order
-                        </button>
-                        <button id="cancelOrderBtn" class="bg-red-500 text-white font-medium px-4 py-2 rounded hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                            Cancel Order
-                        </button>
+                    <div>
+                        <p id="notificationMessage">Operation successful!</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
 
-    <!-- Notifications -->
-    <div id="notification" class="fixed top-4 right-4 max-w-md transform transition-opacity duration-300 opacity-0 pointer-events-none z-50">
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md">
-            <div class="flex">
-                <div class="py-1">
-                    <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="footer-title">Our Midterm Explanation</div>
+                    <div class="footer-description">
+                        This web applicatoin is a restaurant management system that allows users, like manager, kitchen-staff, and service-staff, to manage their restaurant operations efficiently. It includes features for managing orders, bills, and customer interactions.
+                        The system is designed to be user-friendly and provides multiple views for different roles within the restaurant. The goal is to streamline the restaurant management process and enhance user experience.
+                    </div>
+                    <div class="team-members">
+                        <div class="member">Phong Hoang</div>
+                        <div class="member">Myat Thiri Maung</div>
+                        <div class="member">Thu Reain Htet Aung</div>
+                    </div>
+                    <div class="university">Ton Duc Thang University</div>
                 </div>
-                <div>
-                    <p id="notificationMessage">Operation successful!</p>
+                <div class="col-md-4">
+                    <div class="logo-footer">Manwah</div>
+                    <div class="course-name">Service-oriented Architecture Course</div>
                 </div>
             </div>
         </div>
-    </div>
+    </footer>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
     <script src="{{ (url_for('static', path='/js/config.js') ~ '?v=3') if request else '../js/config.js?v=3' }}"></script>
     <script src="{{ (url_for('static', path='/js/api-config.js') ~ '?v=3') if request else '../js/api-config.js?v=3' }}"></script>
     <script src="{{ (url_for('static', path='/js/kitchen-order.js') ~ '?v=3') if request else '../js/kitchen-order.js?v=3' }}"></script>
